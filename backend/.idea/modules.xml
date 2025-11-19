@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/backend.iml" filepath="$PROJECT_DIR$/.idea/backend.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tildau/tildau.iml" filepath="$PROJECT_DIR$/tildau/tildau.iml" />
     </modules>
   </component>
 </project>
