@@ -1,0 +1,80 @@
+package kz.kbtu.tildau.service;
+
+import kz.kbtu.tildau.dto.LoginRequest;
+import kz.kbtu.tildau.dto.LoginResponse;
+import kz.kbtu.tildau.dto.RegisterRequest;
+import kz.kbtu.tildau.dto.RegisterResponse;
+import kz.kbtu.tildau.entity.Role;
+import kz.kbtu.tildau.entity.User;
+import kz.kbtu.tildau.repository.RoleRepository;
+import kz.kbtu.tildau.repository.UserJpaRepository;
+import kz.kbtu.tildau.security.CustomerUserDetails;
+import kz.kbtu.tildau.security.JwtTokenProvider;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public class UserService {
+
+    private final UserJpaRepository userJpaRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public UserService(UserJpaRepository userJpaRepository,
+                       RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
+        this.userJpaRepository = userJpaRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    public RegisterResponse register(RegisterRequest request) {
+        if (request.getName() == null || request.getName().trim().isEmpty()
+                || request.getEmail() == null || request.getEmail().trim().isEmpty()
+                || request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new RuntimeException("All fields are required");
+        }
+
+        if (!request.getEmail().matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            throw new RuntimeException("Invalid email format");
+        }
+
+        Optional<User> existingUser = userJpaRepository.findByEmail(request.getEmail());
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("User with this email already exists");
+        }
+
+        Role defaultRole = roleRepository.findByName("user")
+                .orElseThrow(() -> new RuntimeException("Default role not found"));
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(defaultRole);
+
+        userJpaRepository.save(user);
+        return new RegisterResponse("User successfully registered");
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        User user = userJpaRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+        UserDetails userDetails = new CustomerUserDetails(user);
+        String token = jwtTokenProvider.generateToken(userDetails);
+        return new LoginResponse(token);
+    }
+    public User getCurrentUser(String email) {
+        return userJpaRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+}
