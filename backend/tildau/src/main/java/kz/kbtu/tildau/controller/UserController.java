@@ -33,14 +33,29 @@ public class UserController {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         User user = userDetails.getUser();
         UserResponse response = new UserResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRole().getName()
+                user.getRole().getName(),
+                user.getAvatarUrl()
         );
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/me")
+    public ResponseEntity<UpdateProfileResponse> updateProfile(
+            @AuthenticationPrincipal CustomerUserDetails userDetails,
+            @RequestBody UpdateProfileRequest request
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = userDetails.getUser();
+
+        UpdateProfileResponse response =
+                userService.updateProfile(user.getId(), request);
 
         return ResponseEntity.ok(response);
     }

@@ -1,8 +1,5 @@
 package kz.kbtu.tildau.service;
-import kz.kbtu.tildau.dto.LoginRequest;
-import kz.kbtu.tildau.dto.LoginResponse;
-import kz.kbtu.tildau.dto.RegisterRequest;
-import kz.kbtu.tildau.dto.RegisterResponse;
+import kz.kbtu.tildau.dto.*;
 import kz.kbtu.tildau.entity.Role;
 import kz.kbtu.tildau.entity.User;
 import kz.kbtu.tildau.repository.RoleRepository;
@@ -167,4 +164,124 @@ class UserServiceTest {
 
         assertEquals("User with this email already exists", exception.getMessage());
     }
+
+    @Test
+    void updateProfile_Success_WithoutPasswordChange() {
+        UUID userId = UUID.randomUUID();
+
+        User existingUser = new User();
+        existingUser.setId(userId);
+        existingUser.setName("Old Name");
+        existingUser.setEmail("old@example.com");
+        existingUser.setPassword("encodedPassword");
+
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        request.setName("New Name");
+        request.setEmail("new@example.com");
+
+        when(userJpaRepository.findById(userId))
+                .thenReturn(Optional.of(existingUser));
+        when(userJpaRepository.findByEmail("new@example.com"))
+                .thenReturn(Optional.empty());
+
+        UpdateProfileResponse response = userService.updateProfile(userId, request);
+
+        assertEquals("Profile updated successfully", response.getMessage());
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userJpaRepository).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        assertEquals("New Name", savedUser.getName());
+        assertEquals("new@example.com", savedUser.getEmail());
+        assertEquals("encodedPassword", savedUser.getPassword()); // пароль не менялся
+    }
+
+    @Test
+    void updateProfile_Success_WithPasswordChange() {
+        UUID userId = UUID.randomUUID();
+
+        User existingUser = new User();
+        existingUser.setId(userId);
+        existingUser.setEmail("old@example.com");
+        existingUser.setPassword("oldEncodedPassword");
+
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        request.setEmail("old@example.com");
+        request.setPassword("newPassword123");
+
+        when(userJpaRepository.findById(userId))
+                .thenReturn(Optional.of(existingUser));
+        when(passwordEncoder.encode("newPassword123"))
+                .thenReturn("newEncodedPassword");
+
+        UpdateProfileResponse response = userService.updateProfile(userId, request);
+
+        assertEquals("Profile updated successfully", response.getMessage());
+
+        verify(userJpaRepository).save(existingUser);
+        assertEquals("newEncodedPassword", existingUser.getPassword());
+    }
+
+    @Test
+    void updateProfile_Fails_WhenUserNotFound() {
+        UUID userId = UUID.randomUUID();
+
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        request.setName("New Name");
+
+        when(userJpaRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> userService.updateProfile(userId, request));
+
+        assertEquals("User not found", exception.getMessage());
+    }
+
+    @Test
+    void updateProfile_Fails_WhenEmailAlreadyTaken() {
+        UUID userId = UUID.randomUUID();
+
+        User currentUser = new User();
+        currentUser.setId(userId);
+        currentUser.setEmail("current@example.com");
+
+        User otherUser = new User();
+        otherUser.setId(UUID.randomUUID());
+        otherUser.setEmail("taken@example.com");
+
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        request.setEmail("taken@example.com");
+
+        when(userJpaRepository.findById(userId))
+                .thenReturn(Optional.of(currentUser));
+        when(userJpaRepository.findByEmail("taken@example.com"))
+                .thenReturn(Optional.of(otherUser));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> userService.updateProfile(userId, request));
+
+        assertEquals("Email already in use", exception.getMessage());
+    }
+
+    @Test
+    void updateProfile_Fails_WhenEmailInvalid() {
+        UUID userId = UUID.randomUUID();
+
+        User user = new User();
+        user.setId(userId);
+
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        request.setEmail("invalid-email");
+
+        when(userJpaRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> userService.updateProfile(userId, request));
+
+        assertEquals("Invalid email format", exception.getMessage());
+    }
+
 }

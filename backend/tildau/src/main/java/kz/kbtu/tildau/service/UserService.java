@@ -1,11 +1,11 @@
 package kz.kbtu.tildau.service;
 
-import kz.kbtu.tildau.dto.LoginRequest;
-import kz.kbtu.tildau.dto.LoginResponse;
-import kz.kbtu.tildau.dto.RegisterRequest;
-import kz.kbtu.tildau.dto.RegisterResponse;
+import kz.kbtu.tildau.dto.*;
 import kz.kbtu.tildau.entity.Role;
 import kz.kbtu.tildau.entity.User;
+import kz.kbtu.tildau.exception.BadRequestException;
+import kz.kbtu.tildau.exception.NotFoundException;
+import kz.kbtu.tildau.exception.UnauthorizedException;
 import kz.kbtu.tildau.repository.RoleRepository;
 import kz.kbtu.tildau.repository.UserJpaRepository;
 import kz.kbtu.tildau.security.CustomerUserDetails;
@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -37,20 +38,20 @@ public class UserService {
         if (request.getName() == null || request.getName().trim().isEmpty()
                 || request.getEmail() == null || request.getEmail().trim().isEmpty()
                 || request.getPassword() == null || request.getPassword().trim().isEmpty()) {
-            throw new RuntimeException("All fields are required");
+            throw new BadRequestException("All fields are required");
         }
 
         if (!request.getEmail().matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
-            throw new RuntimeException("Invalid email format");
+            throw new BadRequestException("Invalid email format");
         }
 
         Optional<User> existingUser = userJpaRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
-            throw new RuntimeException("User with this email already exists");
+            throw new BadRequestException("User with this email already exists");
         }
 
         Role defaultRole = roleRepository.findByName("user")
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
+                .orElseThrow(() -> new NotFoundException("Default role not found"));
 
         User user = new User();
         user.setName(request.getName());
@@ -64,10 +65,10 @@ public class UserService {
 
     public LoginResponse login(LoginRequest request) {
         User user = userJpaRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new UnauthorizedException("Invalid password");
         }
         UserDetails userDetails = new CustomerUserDetails(user);
         String token = jwtTokenProvider.generateToken(userDetails);
@@ -75,6 +76,43 @@ public class UserService {
     }
     public User getCurrentUser(String email) {
         return userJpaRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
+    }
+
+    public UpdateProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
+
+        User user = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (request.getEmail() != null) {
+            if (!isValidEmail(request.getEmail())) {
+                throw new BadRequestException("Invalid email format");
+            }
+            if (!request.getEmail().equals(user.getEmail())) {
+                userJpaRepository.findByEmail(request.getEmail())
+                        .ifPresent(existingUser -> {
+                            throw new BadRequestException("Email already in use");
+                        });
+
+                user.setEmail(request.getEmail());
+            }
+        }
+
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            String encodedPassword = passwordEncoder.encode(request.getPassword());
+            user.setPassword(encodedPassword);
+        }
+
+        userJpaRepository.save(user);
+
+        return new UpdateProfileResponse("Profile updated successfully");
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     }
 }
