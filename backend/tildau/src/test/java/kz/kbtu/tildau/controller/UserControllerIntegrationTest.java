@@ -322,4 +322,39 @@ public class UserControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void deleteProfile_Success_WithToken() throws Exception {
+        RegisterRequest register = new RegisterRequest();
+        register.setName("DeleteMe");
+        register.setEmail("deleteme@test.com");
+        register.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(register)));
+
+        LoginRequest login = new LoginRequest();
+        login.setEmail("deleteme@test.com");
+        login.setPassword("password123");
+
+        String loginResponse = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(login)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String token = objectMapper.readTree(loginResponse).get("token").asText();
+
+        mockMvc.perform(delete("/api/me")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Profile deleted successfully"));
+    }
+
+    @Test
+    void deleteProfile_Fails_WithoutToken() throws Exception {
+        mockMvc.perform(delete("/api/me"))
+                .andExpect(status().isForbidden());
+    }
 }

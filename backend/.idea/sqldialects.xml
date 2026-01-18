@@ -2,5 +2,6 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/tildau/src/main/resources/db/migration/V1__init_auth.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/tildau/src/main/resources/db/migration/V2__defects_and_courses.sql" dialect="GenericSQL" />
   </component>
 </project>

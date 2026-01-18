@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -51,12 +53,19 @@ public class UserController {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         User user = userDetails.getUser();
-
         UpdateProfileResponse response =
                 userService.updateProfile(user.getId(), request);
-
         return ResponseEntity.ok(response);
+    }
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse deleteProfile(@AuthenticationPrincipal CustomerUserDetails userDetails) {
+        if (userDetails == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+        UUID userId = userDetails.getUser().getId();
+        userService.deleteProfile(userId);
+        return new ApiResponse("Profile deleted successfully");
     }
 }

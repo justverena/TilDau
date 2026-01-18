@@ -284,4 +284,31 @@ class UserServiceTest {
         assertEquals("Invalid email format", exception.getMessage());
     }
 
+    @Test
+    void deleteProfile_Success() {
+        UUID userId = UUID.randomUUID();
+
+        User existingUser = new User();
+        existingUser.setId(userId);
+        existingUser.setEmail("user@test.com");
+
+        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+        userService.deleteProfile(userId);
+
+        verify(userJpaRepository, times(1)).delete(existingUser);
+    }
+
+    @Test
+    void deleteProfile_Fails_WhenUserNotFound() {
+        UUID userId = UUID.randomUUID();
+
+        when(userJpaRepository.findById(userId)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> userService.deleteProfile(userId));
+
+        assertEquals("User not found", exception.getMessage());
+    }
+
 }

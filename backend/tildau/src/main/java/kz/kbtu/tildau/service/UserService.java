@@ -74,10 +74,6 @@ public class UserService {
         String token = jwtTokenProvider.generateToken(userDetails);
         return new LoginResponse(token);
     }
-    public User getCurrentUser(String email) {
-        return userJpaRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-    }
 
     public UpdateProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
 
@@ -114,5 +110,12 @@ public class UserService {
 
     private boolean isValidEmail(String email) {
         return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+
+    public void deleteProfile(UUID userId) {
+        User user = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        userJpaRepository.delete(user);
     }
 }
