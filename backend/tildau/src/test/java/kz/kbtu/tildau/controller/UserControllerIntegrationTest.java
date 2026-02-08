@@ -1,20 +1,17 @@
 package kz.kbtu.tildau.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kz.kbtu.tildau.dto.LoginRequest;
-import kz.kbtu.tildau.dto.RegisterRequest;
-import kz.kbtu.tildau.dto.UpdateProfileRequest;
+import kz.kbtu.tildau.dto.auth.LoginRequest;
+import kz.kbtu.tildau.dto.auth.RegisterRequest;
+import kz.kbtu.tildau.dto.user.UpdateProfileRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -25,23 +22,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class UserControllerIntegrationTest {
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
-            .withDatabaseName("tildau_test");
-
-    @DynamicPropertySource
-    static void registerDatasourceProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
-    }
-
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setup() throws Exception {
+        RegisterRequest register = new RegisterRequest();
+        register.setName("Jane");
+        register.setEmail("jane@test.com");
+        register.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(register)));
+    }
 
     @Test
     void register_success() throws Exception {
@@ -102,14 +99,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void login_success() throws Exception {
-        RegisterRequest register = new RegisterRequest();
-        register.setName("Jane");
-        register.setEmail("jane@test.com");
-        register.setPassword("password123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(register)));
 
         LoginRequest login = new LoginRequest();
         login.setEmail("jane@test.com");
@@ -124,18 +113,10 @@ public class UserControllerIntegrationTest {
 
     @Test
     void login_fails_when_password_wrong() throws Exception {
-        RegisterRequest register = new RegisterRequest();
-        register.setName("Jan");
-        register.setEmail("jan@test.com");
-        register.setPassword("password123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(register)));
 
         LoginRequest login = new LoginRequest();
-        login.setEmail("jan@test.com");
-        login.setPassword("wrong");
+        login.setEmail("jane@test.com");
+        login.setPassword("wrong-password");
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,17 +132,8 @@ public class UserControllerIntegrationTest {
 
     @Test
     void me_success_with_token() throws Exception {
-        RegisterRequest register = new RegisterRequest();
-        register.setName("Alex");
-        register.setEmail("alex@test.com");
-        register.setPassword("password123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(register)));
-
         LoginRequest login = new LoginRequest();
-        login.setEmail("alex@test.com");
+        login.setEmail("jane@test.com");
         login.setPassword("password123");
 
         String response = mockMvc.perform(post("/api/auth/login")
@@ -176,22 +148,13 @@ public class UserControllerIntegrationTest {
         mockMvc.perform(get("/api/me")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("alex@test.com"));
+                .andExpect(jsonPath("$.email").value("jane@test.com"));
     }
 
     @Test
     void update_profile_success_without_password() throws Exception {
-        RegisterRequest register = new RegisterRequest();
-        register.setName("Mike");
-        register.setEmail("mike@test.com");
-        register.setPassword("password123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(register)));
-
         LoginRequest login = new LoginRequest();
-        login.setEmail("mike@test.com");
+        login.setEmail("jane@test.com");
         login.setPassword("password123");
 
         String loginResponse = mockMvc.perform(post("/api/auth/login")
@@ -218,18 +181,9 @@ public class UserControllerIntegrationTest {
 
     @Test
     void update_profile_success_with_password_change() throws Exception {
-        RegisterRequest register = new RegisterRequest();
-        register.setName("Anna");
-        register.setEmail("anna@test.com");
-        register.setPassword("oldPassword123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(register)));
-
         LoginRequest login = new LoginRequest();
-        login.setEmail("anna@test.com");
-        login.setPassword("oldPassword123");
+        login.setEmail("jane@test.com");
+        login.setPassword("password123");
 
         String response = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -252,23 +206,15 @@ public class UserControllerIntegrationTest {
 
     @Test
     void update_profile_fails_when_email_taken() throws Exception {
-        RegisterRequest r1 = new RegisterRequest();
-        r1.setName("User1");
-        r1.setEmail("user1@test.com");
-        r1.setPassword("password123");
+
+        RegisterRequest register = new RegisterRequest();
+        register.setName("User2");
+        register.setEmail("user2@test.com");
+        register.setPassword("password123");
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(r1)));
-
-        RegisterRequest r2 = new RegisterRequest();
-        r2.setName("User2");
-        r2.setEmail("user2@test.com");
-        r2.setPassword("password123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(r2)));
+                .content(objectMapper.writeValueAsString(register)));
 
         LoginRequest login = new LoginRequest();
         login.setEmail("user2@test.com");
@@ -283,7 +229,7 @@ public class UserControllerIntegrationTest {
 
         String token = objectMapper.readTree(response).get("token").asText();
         UpdateProfileRequest updateRequest = new UpdateProfileRequest();
-        updateRequest.setEmail("user1@test.com");
+        updateRequest.setEmail("jane@test.com");
 
         mockMvc.perform(put("/api/me")
                         .header("Authorization", "Bearer " + token)
@@ -305,17 +251,8 @@ public class UserControllerIntegrationTest {
 
     @Test
     void update_profile_fails_when_email_invalid() throws Exception {
-        RegisterRequest register = new RegisterRequest();
-        register.setName("Invalid");
-        register.setEmail("valid@test.com");
-        register.setPassword("password123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(register)));
-
         LoginRequest login = new LoginRequest();
-        login.setEmail("valid@test.com");
+        login.setEmail("jane@test.com");
         login.setPassword("password123");
 
         String response = mockMvc.perform(post("/api/auth/login")
@@ -338,18 +275,15 @@ public class UserControllerIntegrationTest {
     }
 
     @Test
+    void deleteProfile_Fails_WithoutToken() throws Exception {
+        mockMvc.perform(delete("/api/me"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void deleteProfile_Success_WithToken() throws Exception {
-        RegisterRequest register = new RegisterRequest();
-        register.setName("DeleteMe");
-        register.setEmail("deleteme@test.com");
-        register.setPassword("password123");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(register)));
-
         LoginRequest login = new LoginRequest();
-        login.setEmail("deleteme@test.com");
+        login.setEmail("jane@test.com");
         login.setPassword("password123");
 
         String loginResponse = mockMvc.perform(post("/api/auth/login")
@@ -365,11 +299,5 @@ public class UserControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Profile deleted successfully"));
-    }
-
-    @Test
-    void deleteProfile_Fails_WithoutToken() throws Exception {
-        mockMvc.perform(delete("/api/me"))
-                .andExpect(status().isForbidden());
     }
 }

@@ -1,4 +1,4 @@
-package kz.kbtu.tildau.dto;
+package kz.kbtu.tildau.dto.user;
 
 public class UpdateProfileResponse {
     private String message;

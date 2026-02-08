@@ -1,7 +1,8 @@
-package kz.kbtu.tildau.dto;
+package kz.kbtu.tildau.dto.course;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
@@ -9,10 +10,9 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
+@Getter
+public class CourseShortResponse {
     private UUID id;
-    private String name;
-    private String email;
-    private String role;
-    private String avatarUrl;
+    private String title;
+    private String description;
 }

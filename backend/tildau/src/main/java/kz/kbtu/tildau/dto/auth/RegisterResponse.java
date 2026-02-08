@@ -1,4 +1,4 @@
-package kz.kbtu.tildau.dto;
+package kz.kbtu.tildau.dto.auth;
 
 public class RegisterResponse {
 

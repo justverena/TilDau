@@ -1,6 +1,14 @@
 package kz.kbtu.tildau.controller;
 
-import kz.kbtu.tildau.dto.*;
+import kz.kbtu.tildau.dto.auth.LoginRequest;
+import kz.kbtu.tildau.dto.auth.LoginResponse;
+import kz.kbtu.tildau.dto.auth.RegisterRequest;
+import kz.kbtu.tildau.dto.auth.RegisterResponse;
+import kz.kbtu.tildau.dto.user.ApiResponse;
+import kz.kbtu.tildau.dto.user.UpdateProfileRequest;
+import kz.kbtu.tildau.dto.user.UpdateProfileResponse;
+import kz.kbtu.tildau.dto.user.UserResponse;
+import kz.kbtu.tildau.exception.UnauthorizedException;
 import kz.kbtu.tildau.security.CustomerUserDetails;
 import kz.kbtu.tildau.service.UserService;
 import kz.kbtu.tildau.entity.User;
@@ -62,7 +70,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deleteProfile(@AuthenticationPrincipal CustomerUserDetails userDetails) {
         if (userDetails == null) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
         UUID userId = userDetails.getUser().getId();
         userService.deleteProfile(userId);

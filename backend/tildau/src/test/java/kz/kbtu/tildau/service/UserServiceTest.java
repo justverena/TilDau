@@ -1,5 +1,10 @@
 package kz.kbtu.tildau.service;
-import kz.kbtu.tildau.dto.*;
+import kz.kbtu.tildau.dto.auth.LoginRequest;
+import kz.kbtu.tildau.dto.auth.LoginResponse;
+import kz.kbtu.tildau.dto.auth.RegisterRequest;
+import kz.kbtu.tildau.dto.auth.RegisterResponse;
+import kz.kbtu.tildau.dto.user.UpdateProfileRequest;
+import kz.kbtu.tildau.dto.user.UpdateProfileResponse;
 import kz.kbtu.tildau.entity.Role;
 import kz.kbtu.tildau.entity.User;
 import kz.kbtu.tildau.repository.RoleRepository;
