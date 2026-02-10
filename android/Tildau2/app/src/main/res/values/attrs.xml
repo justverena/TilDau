@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="itemMoreRowTitleText" format="string"/>
+    <attr name="itemMoreRowDetailsText" format="string"/>
+    <attr name="itemMoreRowTitleColor" format="color"/>
+    <attr name="itemMoreRowDetailsColor" format="color"/>
+    <attr name="itemMoreRowDividerColor" format="color"/>
+</resources>
+

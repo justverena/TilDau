@@ -1,0 +1,13 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#40643FDB">
+
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <corners android:radius="33dp"/>
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+
+    <item android:drawable="@drawable/bg_button_shape"/>
+
+</ripple>
