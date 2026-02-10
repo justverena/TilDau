@@ -16,5 +16,9 @@ def generate_feedback(flags: list[str]) -> list[str]:
             feedback.append("Practice pronunciation carefully / Дауыс шығару жаттығуын мұқият жасаңыз")
         elif f == "word_count_mismatch":
             feedback.append("Some words may be missing or extra / Кейбір сөздер жетіспеуі немесе артық болуы мүмкін")
+        elif f == "low_speech_quality":
+            feedback.append("Your speech differs a lot from the reference / Сіздің сөйлеуіңіз үлгіден айтарлықтай ерекшеленеді")
+        elif f == "unstable_pronunciation":
+            feedback.append("Your pronunciation is a bit unstable / Сөйлеуіңізде тұрақсыздық байқалады")
 
     return feedback

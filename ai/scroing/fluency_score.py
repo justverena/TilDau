@@ -3,8 +3,8 @@ def score_fluency(metrics):
     score = 100
     flags = []
     fast_threshold = 5.0
-    many_long_pauses_threshold = 2
-    avg_pause_threshold = 0.5
+    many_long_pauses_threshold = 3
+    avg_pause_threshold = 0.8
 
     if metrics["tempo_syllables_per_sec"] > fast_threshold:
         score -= 10
