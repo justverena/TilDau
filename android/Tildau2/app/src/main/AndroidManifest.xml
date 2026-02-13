@@ -39,8 +39,8 @@
         <activity android:name=".ui.register.RegisterPasswordActivity" />
         <activity android:name=".ui.profile.AccountActivity"/>
         <activity android:name=".ui.profile.ProfileViewActivity"/>
-        <activity android:name=".ui.home.CoursesActivity"/>
         <activity android:name=".ui.profile.ProfileEditActivity"/>
+        <activity android:name=".ui.course.CoursesActivity"/>
 
 
 

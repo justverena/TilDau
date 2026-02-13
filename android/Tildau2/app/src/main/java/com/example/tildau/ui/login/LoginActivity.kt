@@ -12,7 +12,7 @@ import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
 import com.example.tildau.databinding.ActivityLoginBinding
-import com.example.tildau.ui.home.CoursesActivity
+import com.example.tildau.ui.course.CoursesActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -50,8 +50,6 @@ class LoginActivity : AppCompatActivity() {
             )
             binding.etPassword.setSelection(binding.etPassword.text.length)
         }
-
-        Toast.makeText(this, "LoginActivity started", Toast.LENGTH_SHORT).show()
 
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()

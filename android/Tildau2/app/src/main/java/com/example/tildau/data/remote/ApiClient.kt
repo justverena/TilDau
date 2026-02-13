@@ -1,5 +1,6 @@
 package com.example.tildau.data.remote
 
+import android.util.Log
 import com.example.tildau.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -40,13 +41,18 @@ object ApiClient {
 class AuthInterceptor(private val tokenProvider: () -> String?) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val token = tokenProvider()
-        val request: Request = if (token != null) {
-            chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
+        val originalRequest = chain.request()
+        val requestBuilder = originalRequest.newBuilder()
+
+        if (!token.isNullOrEmpty()) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
+            Log.d("AuthInterceptor", "Token added to request: $token")
         } else {
-            chain.request()
+            Log.d("AuthInterceptor", "No token found! Request sent without Authorization header")
         }
-        return chain.proceed(request)
+
+        val requestWithToken = requestBuilder.build()
+        Log.d("AuthInterceptor", "Sending request to: ${requestWithToken.url}")
+        return chain.proceed(requestWithToken)
     }
 }

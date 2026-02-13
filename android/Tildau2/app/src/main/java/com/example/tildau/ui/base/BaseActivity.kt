@@ -9,7 +9,7 @@ import com.example.tildau.ui.home.HomeActivity
 import com.example.tildau.ui.profile.AccountActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.tildau.ui.home.CoursesActivity
+import com.example.tildau.ui.course.CoursesActivity
 
 
 abstract class BaseActivity : AppCompatActivity() {
