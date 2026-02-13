@@ -5,7 +5,7 @@ from embedding.extractor import extract_embedding
 from embedding.similarity import cosine_similarity
 from scroing.embedding_score import score_embedding
 
-path = "/var/folders/18/tvmsghm137n82rm165_hbqcm0000gn/T/tmpa2i3yxyc.wav"
+path = "tests/sample.wav"
 
 sr = 16000
 

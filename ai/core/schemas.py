@@ -1,11 +1,5 @@
-# core/schema.py
 from pydantic import BaseModel
 from typing import List, Dict, Any
-
-class AnalyzeRequest(BaseModel):
-    audio_url: str
-    expected_text: str
-    exercise_type: str = "READ_ALOUD"
 
 class AnalyzeResponse(BaseModel):
     pronunciation_score: int

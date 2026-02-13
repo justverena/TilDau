@@ -1,5 +1,6 @@
 package kz.kbtu.tildau.entity;
 import jakarta.persistence.*;
+import kz.kbtu.tildau.enums.ExerciseType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -23,7 +24,8 @@ public class Exercise {
     private CourseUnit unit;
 
     @Column(name = "exercise_type")
-    private String exerciseType;
+    @Enumerated(EnumType.STRING)
+    private ExerciseType exerciseType;
 
     @Column(name = "title")
     private String title;

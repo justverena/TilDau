@@ -20,5 +20,7 @@ def generate_feedback(flags: list[str]) -> list[str]:
             feedback.append("Your speech differs a lot from the reference / Сіздің сөйлеуіңіз үлгіден айтарлықтай ерекшеленеді")
         elif f == "unstable_pronunciation":
             feedback.append("Your pronunciation is a bit unstable / Сөйлеуіңізде тұрақсыздық байқалады")
-
+# "too_slow_or_no_speech"
+# "low_speech_quality"
+# "too_much_silence"
     return feedback

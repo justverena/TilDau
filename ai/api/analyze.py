@@ -1,16 +1,28 @@
-from fastapi import APIRouter
-from core.schemas import AnalyzeRequest, AnalyzeResponse
+from fastapi import APIRouter, UploadFile, File, Form
+import tempfile
+import shutil
+import os
+
+from core.schemas import AnalyzeResponse
 from scroing.overall_score import compute_overall_score
 from feedback.rules import generate_feedback
 
 router = APIRouter()
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-def analyze(req: AnalyzeRequest):
+async def analyze(
+    audio: UploadFile = File(...),
+    expected_text: str = Form(...)
+):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+        shutil.copyfileobj(audio.file, tmp)
+        tmp_path = tmp.name
+
     result = compute_overall_score(
-        audio_url=req.audio_url,
-        expected_text=req.expected_text
+        audio_path=tmp_path,
+        expected_text=expected_text
     )
 
     result["feedback"] = generate_feedback(result["flags"])
+
     return result

@@ -7,9 +7,10 @@ def score_embedding(similarity: float) -> dict:
     score = int(max(0, min(100, similarity * 100)))
 
     flags = []
-    if similarity < 0.7:
+    if similarity < 0.85:
+        score -= 5
         flags.append("low_speech_quality")
-    elif similarity < 0.85:
+    elif similarity < 0.9:
         flags.append("unstable_pronunciation")
 
     return {

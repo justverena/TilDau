@@ -5,12 +5,14 @@ import kz.kbtu.tildau.entity.*;
 import kz.kbtu.tildau.exception.NotFoundException;
 import kz.kbtu.tildau.exception.UnauthorizedException;
 import kz.kbtu.tildau.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CourseService {
 
@@ -19,16 +21,6 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseUnitRepository courseUnitRepository;
     private final ExerciseRepository exerciseRepository;
-
-    public CourseService(UserJpaRepository userJpaRepository,UserDefectTypeRepository userDefectTypeRepository,
-                         CourseRepository courseRepository, CourseUnitRepository courseUnitRepository,
-                         ExerciseRepository exerciseRepository) {
-        this.userJpaRepository = userJpaRepository;
-        this.userDefectTypeRepository = userDefectTypeRepository;
-        this.courseRepository = courseRepository;
-        this.courseUnitRepository = courseUnitRepository;
-        this.exerciseRepository = exerciseRepository;
-    }
 
     public List<CourseShortResponse> getCoursesForUser(UUID userId) {
 

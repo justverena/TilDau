@@ -2,9 +2,9 @@ def smooth_wer(wer_value: float, method: str = "linear") -> float:
 
     if method == "linear":
         if wer_value >= 1.0:
-            return 0.7
-        elif wer_value > 0.7:
-            return 0.7 + 0.3 * (wer_value - 0.7)
+            return 0.8
+        elif wer_value > 0.8:
+            return 0.8 + 0.3 * (wer_value - 0.8)
         else:
             return wer_value
     elif method == "sqrt":

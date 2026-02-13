@@ -15,6 +15,7 @@ import kz.kbtu.tildau.repository.RoleRepository;
 import kz.kbtu.tildau.repository.UserJpaRepository;
 import kz.kbtu.tildau.security.CustomerUserDetails;
 import kz.kbtu.tildau.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
@@ -29,15 +31,6 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-
-    public UserService(UserJpaRepository userJpaRepository,
-                       RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
-        this.userJpaRepository = userJpaRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     public RegisterResponse register(RegisterRequest request) {
         if (request.getName() == null || request.getName().trim().isEmpty()
