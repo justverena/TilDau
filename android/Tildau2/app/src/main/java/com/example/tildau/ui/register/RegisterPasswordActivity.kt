@@ -10,7 +10,7 @@ import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
 import com.example.tildau.databinding.ActivityRegisterPasswordBinding
-import com.example.tildau.ui.main.MainActivity
+import com.example.tildau.ui.login.AuthActivity
 
 class RegisterPasswordActivity : AppCompatActivity() {
 
@@ -35,7 +35,7 @@ class RegisterPasswordActivity : AppCompatActivity() {
         viewModel.result.observe(this) { result ->
             result.onSuccess { message ->
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, MainActivity::class.java)
+                val intent = Intent(this, AuthActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()

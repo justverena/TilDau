@@ -25,7 +25,7 @@
             android:id="@+id/btnHome"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_square"
+            android:src="@drawable/ic_tasks"
             android:contentDescription="HomeExample"
             app:tint="@color/main_purple" />
 
@@ -33,7 +33,7 @@
             android:id="@+id/labelHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Home"
+            android:text="Statistics"
             android:textSize="12sp"
             android:textColor="@color/main_purple"
             android:gravity="center"

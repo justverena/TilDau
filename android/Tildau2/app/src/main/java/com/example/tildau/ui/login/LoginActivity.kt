@@ -12,7 +12,8 @@ import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
 import com.example.tildau.databinding.ActivityLoginBinding
-import com.example.tildau.ui.course.CoursesActivity
+import com.example.tildau.ui.home.HomeFragment
+import com.example.tildau.ui.main.MainActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -27,15 +28,13 @@ class LoginActivity : AppCompatActivity() {
         val api = ApiClient.createService(AuthApi::class.java)
         val repository = AuthRepository(api)
 
-        viewModel = ViewModelProvider(
-            this,
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return LoginViewModel(repository) as T
-                }
+        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return LoginViewModel(repository) as T
             }
-        )[LoginViewModel::class.java]
+        })[LoginViewModel::class.java]
 
+        // Переключатель видимости пароля
         var isPasswordVisible = false
         binding.btnTogglePassword.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
@@ -51,12 +50,14 @@ class LoginActivity : AppCompatActivity() {
             binding.etPassword.setSelection(binding.etPassword.text.length)
         }
 
+        // Кнопка логина
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
             viewModel.login(email, password)
         }
 
+        // Обработка результата логина
         viewModel.result.observe(this) { result ->
             result.onSuccess { response ->
                 val prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE)
@@ -64,8 +65,13 @@ class LoginActivity : AppCompatActivity() {
                     .putString("jwt_token", response.token)
                     .putString("user_name", response.username)
                     .apply()
+
                 Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, CoursesActivity::class.java))
+
+                // ✅ Запуск MainActivity после успешного логина
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
             }.onFailure {
                 Toast.makeText(this, it.message ?: "Login failed", Toast.LENGTH_SHORT).show()

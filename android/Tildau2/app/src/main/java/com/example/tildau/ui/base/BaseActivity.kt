@@ -5,11 +5,11 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tildau.R
-import com.example.tildau.ui.home.HomeActivity
-import com.example.tildau.ui.profile.AccountActivity
+import com.example.tildau.ui.profile.AccountFragment
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.tildau.ui.course.CoursesActivity
+import com.example.tildau.ui.courses.CoursesFragment
+import com.example.tildau.ui.home.HomeFragment
 
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -26,15 +26,21 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private fun setupTapbar() {
         findViewById<View>(R.id.btnHome).setOnClickListener {
-            startActivity(Intent(this, CoursesActivity::class.java))
+            val intent = Intent(this, HomeFragment::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
         }
 
-//        findViewById<View>(R.id.btnStart).setOnClickListener {
-//            startActivity(Intent(this, StartActivityExample::class.java))
-//        }
+        findViewById<View>(R.id.btnStart).setOnClickListener {
+            val intent = Intent(this, CoursesFragment::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+        }
 
         findViewById<View>(R.id.btnProfile).setOnClickListener {
-            startActivity(Intent(this, AccountActivity::class.java))
+            val intent = Intent(this, AccountFragment::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
         }
     }
 

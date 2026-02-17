@@ -1,11 +1,5 @@
 package com.example.tildau.ui.home
 
-import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.tildau.R
-import com.example.tildau.ui.base.BaseActivity
-
 //class CoursesActivity : BaseActivity() {
 //
 //    override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+
+    <!-- Центральный блок -->
+    <LinearLayout
+        android:id="@+id/contentBlock"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/waveformView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- КРУГ СО СКОРОМ -->
+        <FrameLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_round"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/audioScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:textColor="@color/light_purple"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+        <!-- КНОПКА LISTEN -->
+        <Button
+            android:id="@+id/btnListen"
+            android:layout_width="120dp"
+            android:layout_height="48dp"
+            android:text="Listen"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Слово -->
+        <TextView
+            android:id="@+id/expectedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chair"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#222222"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Произношение -->
+        <TextView
+            android:id="@+id/pronunciationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/tʃeər/"
+            android:textSize="16sp"
+            android:textColor="#888888"
+            android:layout_marginBottom="8dp"/>
+
+    </LinearLayout>
+
+
+    <!-- Waveform -->
+    <com.example.tildau.ui.record.WaveformView
+        android:id="@+id/waveformView"
+        android:layout_width="300dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/contentBlock"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnRecord"/>
+
+
+    <!-- КНОПКА ОСТАНОВКИ (слева) -->
+    <ImageButton
+        android:id="@+id/btnStop"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_circle_transparent"
+        android:src="@drawable/ic_close"
+        android:scaleType="centerInside"
+        android:contentDescription="Stop"
+        app:layout_constraintEnd_toStartOf="@id/btnRecord"
+        app:layout_constraintTop_toTopOf="@id/btnRecord"
+        app:layout_constraintBottom_toBottomOf="@id/btnRecord"
+        android:layout_marginEnd="24dp"
+        app:tint="#FF4D4D" />
+
+
+    <!-- КНОПКА МИКРОФОНА (центр) -->
+    <ImageButton
+        android:id="@+id/btnRecord"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_button"
+        android:src="@drawable/ic_mike"
+        android:scaleType="centerInside"
+        android:contentDescription="Record"
+        app:layout_constraintTop_toBottomOf="@id/waveformView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="#FFFFFF" />
+
+
+    <!-- КНОПКА ВОСПРОИЗВЕДЕНИЯ ЗАПИСИ (справа) -->
+    <ImageButton
+        android:id="@+id/btnPlayRecord"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_circle_transparent"
+        android:src="@drawable/ic_volume"
+        android:scaleType="centerInside"
+        android:contentDescription="Play Record"
+        app:layout_constraintStart_toEndOf="@id/btnRecord"
+        app:layout_constraintTop_toTopOf="@id/btnRecord"
+        app:layout_constraintBottom_toBottomOf="@id/btnRecord"
+        android:layout_marginStart="24dp"
+        app:tint="@color/main_purple" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
