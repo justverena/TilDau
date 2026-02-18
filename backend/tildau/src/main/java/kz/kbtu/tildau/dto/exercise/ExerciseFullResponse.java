@@ -20,3 +20,4 @@ public class ExerciseFullResponse {
     private String expectedText;
     private String referenceAudioUrl;
 }
+ 

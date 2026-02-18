@@ -4,12 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.tildau.R
+import com.example.tildau.data.local.TokenManager
 import com.example.tildau.data.model.course.ExerciseResponse
 import com.example.tildau.data.model.course.UnitResponse
+import com.example.tildau.data.remote.ApiClient
+import com.example.tildau.data.remote.ExerciseApi
 import com.example.tildau.databinding.FragmentUnitBinding
 import com.example.tildau.ui.exercise.ExercisesAdapter
+import com.example.tildau.ui.record.RecordFragment
+import kotlinx.coroutines.launch
 
 class UnitFragment : Fragment() {
 
@@ -18,6 +26,8 @@ class UnitFragment : Fragment() {
 
     private lateinit var adapter: ExercisesAdapter
     private lateinit var unit: UnitResponse
+
+    private lateinit var exerciseApi: ExerciseApi
 
     companion object {
         private const val ARG_UNIT = "ARG_UNIT"
@@ -34,6 +44,10 @@ class UnitFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = arguments?.getSerializable(ARG_UNIT) as UnitResponse
+
+        exerciseApi = ApiClient.createServiceWithToken(
+            ExerciseApi::class.java
+        ) { TokenManager.getToken(requireContext()) }
     }
 
     override fun onCreateView(
@@ -45,10 +59,24 @@ class UnitFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = ExercisesAdapter(unit.exercises)
+        adapter = ExercisesAdapter(unit.exercises) { exercise ->
+            fetchFullExerciseAndOpenRecord(exercise.id.toString())
+        }
+
         binding.recyclerViewExercises.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewExercises.adapter = adapter
     }
+
+    private fun fetchFullExerciseAndOpenRecord(exerciseId: String) {
+        parentFragmentManager.beginTransaction()
+            .replace(
+                R.id.fragmentContainer,
+                RecordFragment.newInstance(exerciseId)
+            )
+            .addToBackStack(null)
+            .commit()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

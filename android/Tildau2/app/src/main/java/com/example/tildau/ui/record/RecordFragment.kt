@@ -1,45 +1,61 @@
 package com.example.tildau.ui.record
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.graphics.Color
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.example.tildau.data.local.TokenManager
+import com.example.tildau.data.model.exercise.ExerciseFullResponse
+import com.example.tildau.data.remote.ApiClient
+import com.example.tildau.data.remote.ExerciseApi
 import com.example.tildau.databinding.FragmentRecordBinding
-import java.io.File
+import kotlinx.coroutines.launch
+import java.io.IOException
 
 class RecordFragment : Fragment() {
 
     private var _binding: FragmentRecordBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var exerciseId: String
+    private var fullExercise: ExerciseFullResponse? = null
+
     private lateinit var recorder: WavAudioRecorder
     private var isRecording = false
-
-    private enum class State {
-        IDLE, RECORD, LISTEN
-    }
-
-    private var currentState = State.IDLE
-
     private var mediaPlayer: MediaPlayer? = null
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                startRecording()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Microphone permission required",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            if (granted) startRecording()
+            else Toast.makeText(
+                requireContext(),
+                "Microphone permission required",
+                Toast.LENGTH_SHORT
+            ).show()
         }
+
+    companion object {
+        private const val ARG_EXERCISE_ID = "ARG_EXERCISE_ID"
+
+        fun newInstance(exerciseId: String): RecordFragment {
+            val fragment = RecordFragment()
+            val bundle = Bundle()
+            bundle.putString(ARG_EXERCISE_ID, exerciseId)
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        exerciseId = arguments?.getString(ARG_EXERCISE_ID) ?: ""
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,29 +67,71 @@ class RecordFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         recorder = WavAudioRecorder(requireContext())
 
-        setState(State.IDLE)
+        fetchFullExercise()
+        setupRecording()
+    }
+
+    private fun fetchFullExercise() {
+
+        val api = ApiClient.createServiceWithToken(ExerciseApi::class.java) {
+            TokenManager.getToken(requireContext())
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val exercise = api.getExercise(exerciseId)
+
+                Log.d("RecordFragment", "Exercise loaded")
+                Log.d("RecordFragment", "Presigned URL: ${exercise.referenceAudioUrl}")
+
+                fullExercise = exercise
+
+                binding.exerciseTitle.text = exercise.title
+                binding.exerciseInstructionText.text = exercise.instruction
+                binding.expectedText.text = exercise.expectedText ?: ""
+
+                setupListenButton()
+
+            } catch (e: Exception) {
+                Log.e("RecordFragment", "Failed to load exercise", e)
+                Toast.makeText(requireContext(), "Failed to load exercise", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setupListenButton() {
+        binding.btnListen.setOnClickListener {
+
+            val url = fullExercise?.referenceAudioUrl
+
+            if (url.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "No reference audio available", Toast.LENGTH_SHORT).show()
+                Log.e("RecordFragment", "Presigned URL is null or empty")
+                return@setOnClickListener
+            }
+
+            Log.d("RecordFragment", "Playing audio from presigned URL")
+            playAudioFromUrl(url)
+        }
+    }
+
+    private fun setupRecording() {
 
         binding.btnRecord.setOnClickListener {
-            if (currentState == State.IDLE) {
+            if (!isRecording)
                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-            } else if (currentState == State.RECORD) {
+            else
                 stopRecording()
-            }
         }
 
         binding.btnStop.setOnClickListener {
-            if (currentState == State.RECORD) {
-                cancelRecording()
-            }
+            if (isRecording) cancelRecording()
         }
 
         binding.btnPlayRecord.setOnClickListener {
-            if (currentState == State.RECORD || currentState == State.LISTEN) {
-                playRecordedAudio()
-            }
+            playRecordedAudio()
         }
 
         recorder.onAmplitudeChanged = { amplitude ->
@@ -83,82 +141,85 @@ class RecordFragment : Fragment() {
         }
     }
 
-    private fun setState(state: State) {
-        currentState = state
-        when (state) {
-            State.IDLE -> {
-                binding.btnStop.visibility = View.GONE
-                binding.btnPlayRecord.visibility = View.GONE
-                binding.waveformView.clear()
-                binding.btnRecord.background.setTint(Color.parseColor("#6200EE"))
-            }
-            State.RECORD -> {
-                binding.btnStop.visibility = View.VISIBLE
-                binding.btnPlayRecord.visibility = View.VISIBLE
-                binding.btnRecord.background.setTint(Color.GRAY)
-            }
-            State.LISTEN -> {
-                binding.btnStop.visibility = View.GONE
-                binding.btnPlayRecord.visibility = View.VISIBLE
-                binding.btnRecord.background.setTint(Color.parseColor("#6200EE"))
-            }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
     private fun startRecording() {
-        try {
-            recorder.startRecording()
-            isRecording = true
-            setState(State.RECORD)
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-        }
+        recorder.startRecording()
+        isRecording = true
     }
 
     private fun stopRecording() {
         recorder.stopRecording()
         isRecording = false
-        setState(State.LISTEN)
-
-        Toast.makeText(
-            requireContext(),
-            "Saved: ${recorder.outputFilePath}",
-            Toast.LENGTH_LONG
-        ).show()
     }
 
     private fun cancelRecording() {
-        if (isRecording) {
-            recorder.stopRecording()
-            isRecording = false
-        }
-
-        recorder.outputFilePath?.let {
-            val file = File(it)
-            if (file.exists()) file.delete()
-        }
-
+        recorder.stopRecording()
+        isRecording = false
         binding.waveformView.clear()
-        setState(State.IDLE)
     }
 
     private fun playRecordedAudio() {
         val path = recorder.outputFilePath ?: return
 
         mediaPlayer?.release()
+
         mediaPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
             setDataSource(path)
             prepare()
             start()
-            setOnCompletionListener {
+        }
+    }
+
+    private fun playAudioFromUrl(url: String) {
+
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        try {
+            mediaPlayer = MediaPlayer().apply {
+
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+
+                setDataSource(url)
+
+                setOnPreparedListener {
+                    Log.d("RecordFragment", "MediaPlayer prepared, starting playback")
+                    start()
+                }
+
+                setOnCompletionListener {
+                    Log.d("RecordFragment", "Playback completed")
+                }
+
+                setOnErrorListener { _, what, extra ->
+                    Log.e("RecordFragment", "MediaPlayer error: what=$what extra=$extra")
+                    true
+                }
+
+                prepareAsync()
             }
+
+        } catch (e: IOException) {
+            Log.e("RecordFragment", "IOException while playing audio", e)
+            Toast.makeText(requireContext(), "Audio playback failed", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         if (isRecording) recorder.stopRecording()
+
         mediaPlayer?.release()
         mediaPlayer = null
         _binding = null

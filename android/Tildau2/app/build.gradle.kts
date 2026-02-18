@@ -46,6 +46,13 @@ android {
         viewBinding = true
         buildConfig = true
     }
+
+    packagingOptions {
+        resources {
+            // игнорируем дублирующиеся MANIFEST.MF
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+        }
+    }
 }
 
 dependencies {
@@ -58,6 +65,7 @@ dependencies {
     implementation(libs.retrofitGson)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    implementation(libs.identity.jvm)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

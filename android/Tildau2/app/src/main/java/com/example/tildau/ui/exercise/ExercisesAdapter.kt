@@ -8,12 +8,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tildau.R
 import com.example.tildau.data.model.course.ExerciseResponse
 
-class ExercisesAdapter(private var exercises: List<ExerciseResponse>) :
-    RecyclerView.Adapter<ExercisesAdapter.ExerciseViewHolder>() {
+class ExercisesAdapter(
+    private var exercises: List<ExerciseResponse>,
+    private val onExerciseClick: ((ExerciseResponse) -> Unit)? = null
+) : RecyclerView.Adapter<ExercisesAdapter.ExerciseViewHolder>() {
 
     inner class ExerciseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.exerciseTitle)
         val instruction: TextView = itemView.findViewById(R.id.exerciseInstruction)
+
+        init {
+            itemView.setOnClickListener {
+                onExerciseClick?.invoke(exercises[adapterPosition])
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExerciseViewHolder {
@@ -29,9 +37,4 @@ class ExercisesAdapter(private var exercises: List<ExerciseResponse>) :
     }
 
     override fun getItemCount(): Int = exercises.size
-
-    fun updateExercises(newExercises: List<ExerciseResponse>) {
-        exercises = newExercises
-        notifyDataSetChanged()
-    }
 }

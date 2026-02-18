@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tildau.R
 import com.example.tildau.data.local.TokenManager
@@ -16,7 +18,9 @@ import com.example.tildau.data.repository.CourseRepository
 import com.example.tildau.databinding.FragmentCourseBinding
 import com.example.tildau.ui.courses.CourseViewModel
 import com.example.tildau.ui.courses.CourseViewModelFactory
+import com.example.tildau.ui.record.RecordFragment
 import com.example.tildau.ui.unit.UnitFragment
+import kotlinx.coroutines.launch
 
 class CourseFragment : Fragment() {
 
@@ -52,7 +56,6 @@ class CourseFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-
 
         binding.courseRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.courseRecyclerView.adapter = adapter
@@ -95,7 +98,6 @@ class CourseFragment : Fragment() {
         }
         return items
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
