@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.tildau.databinding.FragmentHomeBinding
-import com.example.tildau.ui.main.MainActivity
-import com.example.tildau.ui.profile.AccountFragment
-import com.example.tildau.ui.record.RecordFragment
+import com.example.tildau.R
 
 class HomeFragment : Fragment() {
 
@@ -27,11 +27,17 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnEditProfile.setOnClickListener {
-            (activity as? MainActivity)?.openFragment(AccountFragment())
+            findNavController().navigate(R.id.accountFragment)
         }
 
         binding.btnOpenRecorder.setOnClickListener {
-            (activity as? MainActivity)?.openFragment(RecordFragment())
+            val bundle = bundleOf()
+            findNavController().navigate(R.id.recordFragment, bundle)
+        }
+
+        binding.btnLoadingTest.setOnClickListener {
+            val bundle = bundleOf()
+            findNavController().navigate(R.id.analyzeFragment, bundle)
         }
     }
 
@@ -40,5 +46,3 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 }
-
-

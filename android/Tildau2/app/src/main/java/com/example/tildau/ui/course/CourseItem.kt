@@ -1,5 +1,6 @@
 package com.example.tildau.ui.course
 
+import com.example.tildau.data.enums.UnitState
 import com.example.tildau.data.model.course.UnitResponse
 
 sealed class CourseItem {
@@ -17,6 +18,10 @@ sealed class CourseItem {
         val number: Int,
         val title: String,
         val description: String,
-        val unitResponse: UnitResponse
+        val unitResponse: UnitResponse,
+        val state: UnitState,
+        val progress: Int? = null,
+        val lastScore: Int? = null
     ) : CourseItem()
+
 }

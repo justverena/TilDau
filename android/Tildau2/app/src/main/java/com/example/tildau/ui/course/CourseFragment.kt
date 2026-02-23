@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tildau.R
+import com.example.tildau.data.enums.UnitState
 import com.example.tildau.data.local.TokenManager
 import com.example.tildau.data.model.course.CourseFullResponse
 import com.example.tildau.data.remote.ApiClient
@@ -18,9 +19,8 @@ import com.example.tildau.data.repository.CourseRepository
 import com.example.tildau.databinding.FragmentCourseBinding
 import com.example.tildau.ui.courses.CourseViewModel
 import com.example.tildau.ui.courses.CourseViewModelFactory
-import com.example.tildau.ui.record.RecordFragment
-import com.example.tildau.ui.unit.UnitFragment
-import kotlinx.coroutines.launch
+import androidx.core.os.bundleOf
+import androidx.navigation.fragment.findNavController
 
 class CourseFragment : Fragment() {
 
@@ -51,10 +51,11 @@ class CourseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = CourseAdapter(emptyList()) { unitResponse ->
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, UnitFragment.newInstance(unitResponse))
-                .addToBackStack(null)
-                .commit()
+            val bundle = bundleOf("unitResponse" to unitResponse)
+            findNavController().navigate(
+                R.id.action_courseFragment_to_unitFragment,
+                bundle
+            )
         }
 
         binding.courseRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -87,15 +88,26 @@ class CourseFragment : Fragment() {
         items.add(CourseItem.Header(course.title, course.description))
 
         course.units.forEachIndexed { index, unit ->
+
+            val state = when {
+//                unit.isCompleted -> UnitState.COMPLETED
+//                unit.isCurrent -> UnitState.CURRENT
+                else -> UnitState.LOCKED
+            }
+
             items.add(
                 CourseItem.Unit(
                     number = index + 1,
                     title = unit.title,
                     description = unit.description,
-                    unitResponse = unit
+                    unitResponse = unit,
+                    state = state,
+//                    progress = unit.progressPercent,
+//                    lastScore = unit.lastScorePercent
                 )
             )
         }
+
         return items
     }
 

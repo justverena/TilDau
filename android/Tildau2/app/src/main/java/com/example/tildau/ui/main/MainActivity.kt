@@ -1,18 +1,14 @@
 package com.example.tildau.ui.main
 
-
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.Fragment
+import androidx.core.os.bundleOf
+import androidx.navigation.findNavController
 import com.example.tildau.R
 import com.example.tildau.databinding.ActivityMainBinding
 import com.example.tildau.databinding.ViewTapbarBinding
-import com.example.tildau.ui.courses.CoursesFragment
-import com.example.tildau.ui.home.HomeFragment
-import com.example.tildau.ui.profile.AccountFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,64 +19,50 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        tapbarBinding = binding.tapbar
 
-        // binding include уже доступен через ActivityMainBinding
-        tapbarBinding = binding.tapbar  // <--- используем правильное имя поля
-
-        setupTapbar()
         applyWindowInsets()
 
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as androidx.navigation.fragment.NavHostFragment
+        val navController = navHostFragment.navController
+
         if (savedInstanceState == null) {
-            openFragment(HomeFragment())
-        }
-    }
-
-    private fun setupTapbar() {
-        tapbarBinding.btnHome.setOnClickListener {
-            openFragment(HomeFragment())
+            navController.navigate(R.id.resultFragment)
         }
 
-        tapbarBinding.btnStart.setOnClickListener {
-            openFragment(CoursesFragment())
+        tapbarBinding.btnStats.setOnClickListener {
+            navController.navigate(R.id.resultFragment)
         }
-
+        tapbarBinding.btnLesson.setOnClickListener {
+            navController.navigate(R.id.coursesFragment)
+        }
         tapbarBinding.btnProfile.setOnClickListener {
-            openFragment(AccountFragment())
+            navController.navigate(R.id.accountFragment)
         }
-    }
-
-    fun openFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
     }
 
     override fun onBackPressed() {
-        val current = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-
-        if (current !is HomeFragment) {
-            openFragment(HomeFragment())
-        } else {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as androidx.navigation.fragment.NavHostFragment
+        val navController = navHostFragment.navController
+        if (!navController.popBackStack()) {
             super.onBackPressed()
         }
     }
 
     private fun applyWindowInsets() {
         val root = binding.root
-        val tapbarView = tapbarBinding.root  // это реальный View
-
+        val tapbarView = tapbarBinding.root
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val extraBottom = resources.getDimensionPixelSize(R.dimen.tapbar_extra_bottom)
-
-            // используем реальные padding свойства
             tapbarView.setPadding(
                 tapbarView.paddingStart,
                 tapbarView.paddingTop,
                 tapbarView.paddingEnd,
                 systemBars.bottom + extraBottom
             )
-
             insets
         }
     }

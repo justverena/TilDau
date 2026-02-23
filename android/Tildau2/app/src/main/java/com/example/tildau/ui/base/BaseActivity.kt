@@ -25,13 +25,13 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun setupTapbar() {
-        findViewById<View>(R.id.btnHome).setOnClickListener {
+        findViewById<View>(R.id.btnStats).setOnClickListener {
             val intent = Intent(this, HomeFragment::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
 
-        findViewById<View>(R.id.btnStart).setOnClickListener {
+        findViewById<View>(R.id.btnLesson).setOnClickListener {
             val intent = Intent(this, CoursesFragment::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)

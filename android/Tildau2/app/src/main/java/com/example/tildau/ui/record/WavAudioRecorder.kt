@@ -27,11 +27,13 @@ class WavAudioRecorder(private val context: Context) {
     @SuppressLint("MissingPermission")
     fun startRecording() {
 
-        val bufferSize = AudioRecord.getMinBufferSize(
+        val minbufferSize = AudioRecord.getMinBufferSize(
             sampleRate,
             channelConfig,
             audioFormat
         )
+
+        val bufferSize = minbufferSize * 2
 
         audioRecord = AudioRecord(
             MediaRecorder.AudioSource.MIC,
@@ -90,11 +92,6 @@ class WavAudioRecorder(private val context: Context) {
 
                         onAmplitudeChanged?.invoke(max)
 
-                        fos.write(buffer, 0, read)
-                        totalAudioLen += read
-                    }
-
-                    if (read > 0) {
                         fos.write(buffer, 0, read)
                         totalAudioLen += read
                     }

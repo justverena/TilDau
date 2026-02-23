@@ -4,20 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tildau.R
 import com.example.tildau.data.local.TokenManager
-import com.example.tildau.data.model.course.ExerciseResponse
 import com.example.tildau.data.model.course.UnitResponse
 import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.ExerciseApi
 import com.example.tildau.databinding.FragmentUnitBinding
 import com.example.tildau.ui.exercise.ExercisesAdapter
-import com.example.tildau.ui.record.RecordFragment
-import kotlinx.coroutines.launch
+import androidx.core.os.bundleOf
+import androidx.navigation.fragment.findNavController
 
 class UnitFragment : Fragment() {
 
@@ -68,13 +65,11 @@ class UnitFragment : Fragment() {
     }
 
     private fun fetchFullExerciseAndOpenRecord(exerciseId: String) {
-        parentFragmentManager.beginTransaction()
-            .replace(
-                R.id.fragmentContainer,
-                RecordFragment.newInstance(exerciseId)
-            )
-            .addToBackStack(null)
-            .commit()
+        val bundle = bundleOf("exerciseId" to exerciseId)
+        findNavController().navigate(
+            R.id.action_coursesFragment_to_unitFragment,
+            bundle
+        )
     }
 
 

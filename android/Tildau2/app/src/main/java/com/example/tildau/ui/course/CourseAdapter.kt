@@ -3,10 +3,14 @@ package com.example.tildau.ui.course
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tildau.R
+import com.example.tildau.data.enums.UnitState
 import com.example.tildau.data.model.course.UnitResponse
+import com.google.android.material.card.MaterialCardView
 
 class CourseAdapter(
     private var items: List<CourseItem>,
@@ -32,7 +36,7 @@ class CourseAdapter(
         return when (viewType) {
             TYPE_HEADER -> HeaderViewHolder(inflater.inflate(R.layout.item_course_header, parent, false))
             TYPE_FEATURE -> FeatureViewHolder(inflater.inflate(R.layout.item_feature, parent, false))
-            TYPE_UNIT -> UnitViewHolder(inflater.inflate(R.layout.item_section_card, parent, false), onUnitClick)
+            TYPE_UNIT -> UnitViewHolder(inflater.inflate(R.layout.item_unit_card, parent, false), onUnitClick)
             else -> throw IllegalArgumentException("Unknown type")
         }
     }
@@ -70,18 +74,79 @@ class CourseAdapter(
         private val onUnitClick: ((UnitResponse) -> Unit)? = null
     ) : RecyclerView.ViewHolder(itemView) {
 
-        private val numberText: TextView = itemView.findViewById(R.id.sectionNumber)
-        private val titleText: TextView = itemView.findViewById(R.id.sectionTitle)
-        private val descriptionText: TextView = itemView.findViewById(R.id.sectionDescription)
+        private val statusPrimary: TextView = itemView.findViewById(R.id.statusPrimary)
+        private val statusSecondary: TextView = itemView.findViewById(R.id.statusSecondary)
+        private val stateIcon: ImageView = itemView.findViewById(R.id.stateIcon)
+        private val card: MaterialCardView = itemView.findViewById(R.id.unitCard)
+
+        private val numberText: TextView = itemView.findViewById(R.id.unitNumber)
+        private val titleText: TextView = itemView.findViewById(R.id.unitTitle)
+//        private val descriptionText: TextView = itemView.findViewById(R.id.unitDescription)
 
         fun bind(item: CourseItem.Unit) {
+
             numberText.text = item.number.toString()
             titleText.text = item.title
-            descriptionText.text = item.description
+
+            when (item.state) {
+
+                UnitState.LOCKED -> {
+
+                    card.strokeColor =
+                        ContextCompat.getColor(itemView.context, R.color.grey_border)
+
+                    statusPrimary.text = "Locked"
+                    statusSecondary.visibility = View.VISIBLE
+
+                    stateIcon.setImageResource(R.drawable.ic_lock)
+                    stateIcon.setColorFilter(
+                        ContextCompat.getColor(itemView.context, R.color.grey_icon)
+                    )
+
+                    itemView.isEnabled = true
+                }
+
+                UnitState.CURRENT -> {
+
+                    card.strokeColor =
+                        ContextCompat.getColor(itemView.context, R.color.main_purple)
+
+                    statusPrimary.text = "Continues"
+                    statusSecondary.visibility = View.VISIBLE
+                    statusSecondary.text = "Progress: ${item.progress ?: 0}%"
+
+                    stateIcon.setImageResource(R.drawable.ic_play)
+                    stateIcon.setColorFilter(
+                        ContextCompat.getColor(itemView.context, R.color.main_purple)
+                    )
+
+                    itemView.isEnabled = true
+                }
+
+                UnitState.COMPLETED -> {
+
+                    card.strokeColor =
+                        ContextCompat.getColor(itemView.context, R.color.green_complete)
+
+                    statusPrimary.text = "Completed"
+                    statusSecondary.visibility = View.VISIBLE
+                    statusSecondary.text = "Last Score: ${item.lastScore ?: 0}%"
+
+                    stateIcon.setImageResource(R.drawable.ic_check)
+                    stateIcon.setColorFilter(
+                        ContextCompat.getColor(itemView.context, R.color.green_complete)
+                    )
+
+                    itemView.isEnabled = true
+                }
+            }
 
             itemView.setOnClickListener {
-                onUnitClick?.invoke(item.unitResponse)
+                if (item.state != UnitState.LOCKED) {
+                    onUnitClick?.invoke(item.unitResponse)
+                }
             }
         }
+
     }
 }

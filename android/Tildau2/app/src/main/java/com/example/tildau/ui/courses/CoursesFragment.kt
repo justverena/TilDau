@@ -15,7 +15,8 @@ import com.example.tildau.data.remote.CourseApi
 import com.example.tildau.data.repository.CourseRepository
 import com.example.tildau.data.local.TokenManager
 import com.example.tildau.databinding.FragmentCoursesBinding
-import com.example.tildau.ui.course.CourseFragment
+import androidx.core.os.bundleOf
+import androidx.navigation.fragment.findNavController
 
 class CoursesFragment : Fragment() {
 
@@ -37,15 +38,14 @@ class CoursesFragment : Fragment() {
 
         binding.recyclerViewCourses.layoutManager = LinearLayoutManager(requireContext())
         courseAdapter = CoursesAdapter(emptyList()) { course ->
-
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, CourseFragment.newInstance(course.id))
-                .addToBackStack(null)
-                .commit()
+            val bundle = bundleOf("courseId" to course.id)
+            findNavController().navigate(
+                R.id.action_coursesFragment_to_courseFragment,
+                bundle
+            )
         }
 
         binding.recyclerViewCourses.adapter = courseAdapter
-
         val courseApi = ApiClient.createServiceWithToken(
             CourseApi::class.java
         ) { TokenManager.getToken(requireContext()) }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/analyzeFragment">
+
+    <fragment
+        android:id="@+id/analyzeFragment"
+        android:name="com.example.tildau.ui.analyze.AnalyzeFragment"
+        android:label="Analyze">
+
+        <action
+            android:id="@+id/action_analyzeFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+
+        <action
+            android:id="@+id/action_analyzeFragment_to_coursesFragment"
+            app:destination="@id/coursesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.example.tildau.ui.home.HomeFragment"
+        android:label="Result" />
+
+    <fragment
+        android:id="@+id/coursesFragment"
+        android:name="com.example.tildau.ui.courses.CoursesFragment"
+        android:label="Courses">
+
+        <action
+            android:id="@+id/action_coursesFragment_to_courseFragment"
+            app:destination="@id/courseFragment" />
+
+        <action
+            android:id="@+id/action_coursesFragment_to_unitFragment"
+            app:destination="@id/unitFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/courseFragment"
+        android:name="com.example.tildau.ui.course.CourseFragment"
+        android:label="Course">
+
+        <action
+            android:id="@+id/action_courseFragment_to_unitFragment"
+            app:destination="@id/unitFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/unitFragment"
+        android:name="com.example.tildau.ui.unit.UnitFragment"
+        android:label="Unit">
+
+        <action
+            android:id="@+id/action_unitFragment_to_analyzeFragment"
+            app:destination="@id/analyzeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="com.example.tildau.ui.profile.AccountFragment"
+        android:label="Account" />
+
+    <fragment
+        android:id="@+id/recordFragment"
+        android:name="com.example.tildau.ui.record.RecordFragment"
+        android:label="Record" />
+</navigation>

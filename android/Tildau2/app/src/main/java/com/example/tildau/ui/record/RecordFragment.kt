@@ -101,6 +101,15 @@ class RecordFragment : Fragment() {
         }
     }
 
+    private fun releasePlayer() {
+        mediaPlayer?.apply {
+            if (isPlaying) stop()
+            release()
+        }
+        mediaPlayer = null
+    }
+
+
     private fun setupListenButton() {
         binding.btnListen.setOnClickListener {
 
@@ -223,5 +232,7 @@ class RecordFragment : Fragment() {
         mediaPlayer?.release()
         mediaPlayer = null
         _binding = null
+
+        releasePlayer()
     }
 }
