@@ -4,28 +4,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "defect_types")
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class DefectType {
     @Id
     private Integer id;
 
     @Column(unique = true, nullable = false)
     private String name;
-
-    public DefectType(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-    public DefectType() {}
-    public DefectType(String name) {
-        this.name = name;
-    }
 }

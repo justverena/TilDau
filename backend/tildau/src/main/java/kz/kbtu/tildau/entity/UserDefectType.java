@@ -2,6 +2,7 @@ package kz.kbtu.tildau.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import kz.kbtu.tildau.embeddedId.UserDefectTypeId;
 import lombok.*;
 import jakarta.persistence.*;
 import java.util.UUID;
@@ -15,14 +16,15 @@ import java.util.UUID;
 @Builder
 public class UserDefectType {
 
-    @Id
-    private UUID userId;
+    @EmbeddedId
+    private UserDefectTypeId id;
 
-    @MapsId
+    @MapsId("userId")
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @MapsId("defectTypeId")
     @ManyToOne
     @JoinColumn(name = "defect_type_id")
     private DefectType defectType;

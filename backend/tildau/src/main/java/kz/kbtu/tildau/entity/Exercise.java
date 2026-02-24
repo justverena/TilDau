@@ -21,7 +21,7 @@ public class Exercise {
 
     @ManyToOne
     @JoinColumn(name = "unit_id")
-    private CourseUnit unit;
+    private Unit unit;
 
     @Column(name = "exercise_type")
     @Enumerated(EnumType.STRING)

@@ -4,17 +4,16 @@ import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import kz.kbtu.tildau.dto.auth.LoginRequest;
+import kz.kbtu.tildau.dto.auth.RegisterRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.containers.MinIOContainer;
 
@@ -25,13 +24,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public abstract class BaseIntegrationTest {
-
     @Autowired
     protected MockMvc mockMvc;
 
@@ -40,9 +40,6 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    protected PasswordEncoder passwordEncoder;
 
     protected UUID userId;
     protected UUID courseId;
@@ -94,7 +91,12 @@ public abstract class BaseIntegrationTest {
         generateIds();
         truncateTables();
         insertRoles();
-        insertUser();
+        insertDefectTypes();
+        try {
+            insertUser();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         insertUserDefectType();
         insertCourses();
         insertUnits();
@@ -108,7 +110,7 @@ public abstract class BaseIntegrationTest {
     }
 
     private void truncateTables() {
-        jdbcTemplate.execute("TRUNCATE TABLE exercises, course_units, courses, user_defect_types, users, role CASCADE;");
+        jdbcTemplate.execute("TRUNCATE TABLE user_unit_progress, user_course_progress, exercises, course_units, courses, user_defect_types, users, role CASCADE;");
     }
 
     private void insertRoles() {
@@ -117,26 +119,49 @@ public abstract class BaseIntegrationTest {
         jdbcTemplate.update("INSERT INTO role (id, name) VALUES (3, 'doctor') ON CONFLICT DO NOTHING");
     }
 
-    private void insertUser() {
-        String encodedPassword = passwordEncoder.encode(PASSWORD);
+    private void insertDefectTypes() {
+        jdbcTemplate.update("""
+        INSERT INTO defect_types (id, name)
+        VALUES (1, 'articulation')
+        ON CONFLICT DO NOTHING
+    """);
 
         jdbcTemplate.update("""
-            INSERT INTO users (id, name, email, password, role_id, created_at, updated_at)
-            VALUES (?::uuid, ?, ?, ?, ?, now(), now())
-        """,
-                userId,
-                "Jane",
-                EMAIL,
-                encodedPassword,
-                2
+        INSERT INTO defect_types (id, name)
+        VALUES (2, 'stuttering')
+        ON CONFLICT DO NOTHING
+    """);
+    }
+    private void insertUser() throws Exception {
+        RegisterRequest register = new RegisterRequest();
+        register.setName("Jane");
+        register.setEmail(EMAIL);
+        register.setPassword(PASSWORD);
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(register)))
+                .andExpect(status().isOk());
+
+        userId = jdbcTemplate.queryForObject(
+                "SELECT id FROM users WHERE email = ?",
+                UUID.class,
+                EMAIL
         );
     }
 
     private void insertUserDefectType() {
-        jdbcTemplate.update("""
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM user_defect_types WHERE user_id = ?",
+                Integer.class,
+                userId
+        );
+        if (count == 0) {
+            jdbcTemplate.update("""
             INSERT INTO user_defect_types (user_id, defect_type_id)
             VALUES (?::uuid, 2)
         """, userId);
+        }
     }
 
     private void insertCourses() {
@@ -191,6 +216,28 @@ public abstract class BaseIntegrationTest {
         );
 
         return exerciseId;
+    }
+
+    void insertProgress() {
+        jdbcTemplate.update("""
+        INSERT INTO user_course_progress (
+            user_id, course_id,
+            completed_units,
+            total_units,
+            progress_percent
+        )
+        VALUES (?::uuid, ?::uuid, 0, 1, 0)
+    """, userId, courseId);
+
+        jdbcTemplate.update("""
+        INSERT INTO user_unit_progress (
+            user_id, unit_id,
+            completed_exercises,
+            total_exercises,
+            is_completed
+        )
+        VALUES (?::uuid, ?::uuid, 0, 1, false)
+    """, userId, unitId);
     }
 
     protected String loginAndGetToken() throws Exception {

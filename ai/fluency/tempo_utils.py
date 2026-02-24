@@ -6,7 +6,7 @@ def detect_pauses(audio, sr, threshold_db=-35, min_silence_sec=0.25):
     intervals = librosa.effects.split(audio, top_db=-threshold_db)
     pauses = []
     if len(intervals) == 0:
-        return[len(audio)/sr]
+        return[len(audio) / sr]
     
     if intervals[0][0]> 0:
         pauses.append(intervals[0][0]/sr)
@@ -17,7 +17,7 @@ def detect_pauses(audio, sr, threshold_db=-35, min_silence_sec=0.25):
             pauses.append(pause_len)
     
     if intervals[-1][1] < len(audio):
-        pauses.append((len(audio) - intervals[-1][1]/sr))
+        pauses.append((len(audio) - intervals[-1][1]) / sr)
 
     return pauses
 

@@ -37,5 +37,5 @@ application-secrets.properties
 application-local.properties
 
 ### Env files ###
-.env
+../../.env
 .env.*

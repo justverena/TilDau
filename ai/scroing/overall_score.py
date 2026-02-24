@@ -11,8 +11,8 @@ from scroing.pronunciation_score import score_pronunciation
 from scroing.embedding_score import score_embedding
 from preprocessing.runtime import runtime_preprocess
 base_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(base_dir, "../../"))
-reference_embedding_path = os.path.join(project_root, "data/reference_embeddings/wav2vec2_reference_mean.npy")
+project_root = os.path.abspath(os.path.join(base_dir, "../"))
+reference_embedding_path = os.path.join(project_root, "embedding/wav2vec2_reference_mean.npy")
 reference_embedding = np.load(reference_embedding_path)
 
 def compute_overall_score(audio_path: str, expected_text: str, sr=16000):
@@ -25,7 +25,7 @@ def compute_overall_score(audio_path: str, expected_text: str, sr=16000):
         asr_metrics = compute_asr_metrics(expected_text, recognized_text)
         pron_score_dict = score_pronunciation(asr_metrics)
 
-        fluency_metrics = compute_fluency_metrics(audio, sr, expected_text)
+        fluency_metrics = compute_fluency_metrics(audio, sr, recognized_text)
 #        fluency_metrics.update(basic_features)
         fluency_score_dict = score_fluency(fluency_metrics)
 

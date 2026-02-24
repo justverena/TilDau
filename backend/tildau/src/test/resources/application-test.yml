@@ -5,8 +5,24 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     show-sql: true
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: uuid
 
   flyway:
     enabled: true
+
+ai:
+  module:
+    url: http://ai:8000/ai/analyze
+
+jwt:
+  secret: 12345678901234567890123456789012
+  expiration: 3600000
+
+logging:
+  level:
+      org.springframework.security: DEBUG

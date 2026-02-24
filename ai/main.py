@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from api.analyze import router as analyze_router
+import uvicorn
+from api import app
 
-app = FastAPI(title="TilDau AI Module")
-app.include_router(analyze_router, prefix="/ai")
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -8,7 +8,7 @@ def score_fluency(metrics):
     min_tempo_threshold = 1
 
     if metrics["tempo_syllables_per_sec"] < min_tempo_threshold:
-        score -= 20
+        score -= 30
         flags.append("too_slow_or_no_speech")
 
     if metrics.get("silence_ratio", 0) > 0.6:

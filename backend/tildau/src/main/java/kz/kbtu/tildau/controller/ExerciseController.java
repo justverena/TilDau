@@ -1,17 +1,17 @@
 package kz.kbtu.tildau.controller;
 
 import kz.kbtu.tildau.dto.exercise.ExerciseFullResponse;
+import kz.kbtu.tildau.dto.exercise.SubmitExerciseResponse;
 import kz.kbtu.tildau.security.CustomerUserDetails;
 import kz.kbtu.tildau.service.ExerciseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/exercises")
 public class ExerciseController {
@@ -39,5 +39,19 @@ public class ExerciseController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+    }
+
+    @PostMapping("/{id}/submit")
+    public ResponseEntity<SubmitExerciseResponse> submitExercise(
+            @AuthenticationPrincipal CustomerUserDetails userDetails,
+            @PathVariable("id") UUID exerciseId,
+            @RequestParam("file") MultipartFile file
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        SubmitExerciseResponse response = exerciseService.submitExercise(userDetails.getUser().getId(), exerciseId, file);
+        return ResponseEntity.ok(response);
     }
 }

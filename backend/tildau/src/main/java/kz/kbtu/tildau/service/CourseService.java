@@ -36,8 +36,7 @@ public class CourseService {
                 .stream()
                 .map(course -> new CourseShortResponse(
                         course.getId(),
-                        course.getTitle(),
-                        course.getDescription()
+                        course.getTitle()
                 ))
                 .collect(Collectors.toList());
     }

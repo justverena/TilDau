@@ -9,9 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -22,11 +26,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class UserControllerIntegrationTest {
+
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine");
+
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private String token;
 
     @BeforeEach
     void setup() throws Exception {
@@ -38,6 +49,28 @@ public class UserControllerIntegrationTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(register)));
+
+        LoginRequest login = new LoginRequest();
+        login.setEmail("jane@test.com");
+        login.setPassword("password123");
+
+        String response = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(login)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        token = objectMapper.readTree(response).get("token").asText();
+
+        System.out.println(System.getenv("DOCKER_HOST"));
+    }
+
+    @Test
+    void testDocker() {
+        try (GenericContainer<?> container = new GenericContainer<>("alpine:3.18").withCommand("echo", "hello")) {
+            container.start();
+        }
     }
 
     @Test
@@ -99,7 +132,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void login_success() throws Exception {
-
         LoginRequest login = new LoginRequest();
         login.setEmail("jane@test.com");
         login.setPassword("password123");
@@ -113,7 +145,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void login_fails_when_password_wrong() throws Exception {
-
         LoginRequest login = new LoginRequest();
         login.setEmail("jane@test.com");
         login.setPassword("wrong-password");
@@ -132,19 +163,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void me_success_with_token() throws Exception {
-        LoginRequest login = new LoginRequest();
-        login.setEmail("jane@test.com");
-        login.setPassword("password123");
-
-        String response = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String token = objectMapper.readTree(response).get("token").asText();
-
         mockMvc.perform(get("/api/me")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
@@ -153,19 +171,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void update_profile_success_without_password() throws Exception {
-        LoginRequest login = new LoginRequest();
-        login.setEmail("jane@test.com");
-        login.setPassword("password123");
-
-        String loginResponse = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String token = objectMapper.readTree(loginResponse).get("token").asText();
-
         UpdateProfileRequest updateRequest = new UpdateProfileRequest();
         updateRequest.setName("Michael");
         updateRequest.setEmail("michael@test.com");
@@ -181,19 +186,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void update_profile_success_with_password_change() throws Exception {
-        LoginRequest login = new LoginRequest();
-        login.setEmail("jane@test.com");
-        login.setPassword("password123");
-
-        String response = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String token = objectMapper.readTree(response).get("token").asText();
-
         UpdateProfileRequest updateRequest = new UpdateProfileRequest();
         updateRequest.setPassword("newPassword123");
 
@@ -240,7 +232,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void update_profile_fails_without_token() throws Exception {
-
         UpdateProfileRequest updateRequest = new UpdateProfileRequest();
         updateRequest.setName("No auth");
         mockMvc.perform(put("/api/me")
@@ -251,19 +242,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void update_profile_fails_when_email_invalid() throws Exception {
-        LoginRequest login = new LoginRequest();
-        login.setEmail("jane@test.com");
-        login.setPassword("password123");
-
-        String response = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String token = objectMapper.readTree(response).get("token").asText();
-
         UpdateProfileRequest updateRequest = new UpdateProfileRequest();
         updateRequest.setEmail("invalid-email");
 
@@ -282,19 +260,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     void deleteProfile_Success_WithToken() throws Exception {
-        LoginRequest login = new LoginRequest();
-        login.setEmail("jane@test.com");
-        login.setPassword("password123");
-
-        String loginResponse = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String token = objectMapper.readTree(loginResponse).get("token").asText();
-
         mockMvc.perform(delete("/api/me")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())

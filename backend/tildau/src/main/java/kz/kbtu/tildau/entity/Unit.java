@@ -12,7 +12,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-public class CourseUnit {
+public class Unit {
 
     @Id
     @GeneratedValue

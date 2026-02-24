@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:15
@@ -25,6 +23,24 @@ services:
     volumes:
       - minio-data:/data
     command: server /data --console-address ":9001"
+
+  ai:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: tildau-ai
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 2G
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai:/app
+    restart: always
+    depends_on:
+      - postgres
+      - minio
 
 volumes:
   pgdata:
