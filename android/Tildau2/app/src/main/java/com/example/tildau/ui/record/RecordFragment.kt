@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.tildau.R
 import com.example.tildau.data.local.TokenManager
 import com.example.tildau.data.model.exercise.ExerciseFullResponse
 import com.example.tildau.data.remote.ApiClient
@@ -33,11 +35,7 @@ class RecordFragment : Fragment() {
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startRecording()
-            else Toast.makeText(
-                requireContext(),
-                "Microphone permission required",
-                Toast.LENGTH_SHORT
-            ).show()
+            else Toast.makeText(requireContext(), "Microphone permission required", Toast.LENGTH_SHORT).show()
         }
 
     companion object {
@@ -55,6 +53,10 @@ class RecordFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         exerciseId = arguments?.getString(ARG_EXERCISE_ID) ?: ""
+        if (exerciseId.isEmpty()) {
+            Toast.makeText(requireContext(), "Exercise ID missing", Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     override fun onCreateView(
@@ -67,6 +69,8 @@ class RecordFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         recorder = WavAudioRecorder(requireContext())
 
         fetchFullExercise()
@@ -74,7 +78,6 @@ class RecordFragment : Fragment() {
     }
 
     private fun fetchFullExercise() {
-
         val api = ApiClient.createServiceWithToken(ExerciseApi::class.java) {
             TokenManager.getToken(requireContext())
         }
@@ -82,10 +85,6 @@ class RecordFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val exercise = api.getExercise(exerciseId)
-
-                Log.d("RecordFragment", "Exercise loaded")
-                Log.d("RecordFragment", "Presigned URL: ${exercise.referenceAudioUrl}")
-
                 fullExercise = exercise
 
                 binding.exerciseTitle.text = exercise.title
@@ -93,7 +92,6 @@ class RecordFragment : Fragment() {
                 binding.expectedText.text = exercise.expectedText ?: ""
 
                 setupListenButton()
-
             } catch (e: Exception) {
                 Log.e("RecordFragment", "Failed to load exercise", e)
                 Toast.makeText(requireContext(), "Failed to load exercise", Toast.LENGTH_SHORT).show()
@@ -101,38 +99,22 @@ class RecordFragment : Fragment() {
         }
     }
 
-    private fun releasePlayer() {
-        mediaPlayer?.apply {
-            if (isPlaying) stop()
-            release()
-        }
-        mediaPlayer = null
-    }
-
-
     private fun setupListenButton() {
         binding.btnListen.setOnClickListener {
-
             val url = fullExercise?.referenceAudioUrl
-
             if (url.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "No reference audio available", Toast.LENGTH_SHORT).show()
-                Log.e("RecordFragment", "Presigned URL is null or empty")
+                Log.e("RecordFragment", "Reference audio URL is null or empty")
                 return@setOnClickListener
             }
-
-            Log.d("RecordFragment", "Playing audio from presigned URL")
             playAudioFromUrl(url)
         }
     }
 
     private fun setupRecording() {
-
         binding.btnRecord.setOnClickListener {
-            if (!isRecording)
-                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-            else
-                stopRecording()
+            if (!isRecording) permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            else stopRecordingAndNavigate()
         }
 
         binding.btnStop.setOnClickListener {
@@ -155,9 +137,25 @@ class RecordFragment : Fragment() {
         isRecording = true
     }
 
-    private fun stopRecording() {
+    private fun stopRecordingAndNavigate() {
         recorder.stopRecording()
         isRecording = false
+
+        val audioPath = recorder.outputFilePath
+        if (audioPath.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Audio recording failed", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Передаем данные в AnalyzeFragment через NavController
+        val bundle = Bundle().apply {
+            putString("audioPath", audioPath)
+            putString("exerciseId", exerciseId)
+            putString("title", fullExercise?.title)
+            putString("subtitle", fullExercise?.instruction)
+        }
+
+        findNavController().navigate(R.id.action_recordFragment_to_analyzeFragment, bundle)
     }
 
     private fun cancelRecording() {
@@ -168,9 +166,7 @@ class RecordFragment : Fragment() {
 
     private fun playRecordedAudio() {
         val path = recorder.outputFilePath ?: return
-
         mediaPlayer?.release()
-
         mediaPlayer = MediaPlayer().apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
@@ -185,54 +181,37 @@ class RecordFragment : Fragment() {
     }
 
     private fun playAudioFromUrl(url: String) {
-
         mediaPlayer?.release()
         mediaPlayer = null
 
         try {
             mediaPlayer = MediaPlayer().apply {
-
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .setUsage(AudioAttributes.USAGE_MEDIA)
                         .build()
                 )
-
                 setDataSource(url)
-
-                setOnPreparedListener {
-                    Log.d("RecordFragment", "MediaPlayer prepared, starting playback")
-                    start()
-                }
-
-                setOnCompletionListener {
-                    Log.d("RecordFragment", "Playback completed")
-                }
-
+                setOnPreparedListener { start() }
+                setOnCompletionListener { Log.d("RecordFragment", "Playback completed") }
                 setOnErrorListener { _, what, extra ->
                     Log.e("RecordFragment", "MediaPlayer error: what=$what extra=$extra")
                     true
                 }
-
                 prepareAsync()
             }
-
         } catch (e: IOException) {
-            Log.e("RecordFragment", "IOException while playing audio", e)
+            Log.e("RecordFragment", "Audio playback failed", e)
             Toast.makeText(requireContext(), "Audio playback failed", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-
         if (isRecording) recorder.stopRecording()
-
         mediaPlayer?.release()
         mediaPlayer = null
         _binding = null
-
-        releasePlayer()
     }
 }

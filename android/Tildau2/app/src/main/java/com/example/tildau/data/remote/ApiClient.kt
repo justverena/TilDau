@@ -4,20 +4,30 @@ import android.util.Log
 import com.example.tildau.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object ApiClient {
 
-    private val client = OkHttpClient.Builder().build()
+    // Клиент без токена
+    private val client: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(120, TimeUnit.SECONDS) // соединение до 2 минут
+        .readTimeout(120, TimeUnit.SECONDS)    // чтение ответа до 2 минут
+        .writeTimeout(120, TimeUnit.SECONDS)   // отправка данных до 2 минут
+        .build()
 
+    // Клиент с токеном
     fun clientWithToken(tokenProvider: () -> String?): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(tokenProvider))
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
             .build()
     }
 
+    // Сервис без токена
     fun <T> createService(service: Class<T>): T {
         val retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
@@ -27,6 +37,7 @@ object ApiClient {
         return retrofit.create(service)
     }
 
+    // Сервис с токеном
     fun <T> createServiceWithToken(service: Class<T>, tokenProvider: () -> String?): T {
         val retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)

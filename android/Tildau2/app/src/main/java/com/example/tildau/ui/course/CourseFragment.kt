@@ -1,6 +1,7 @@
 package com.example.tildau.ui.course
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +31,7 @@ class CourseFragment : Fragment() {
     private val binding get() = _binding!!
 
     companion object {
-        private const val ARG_COURSE_ID = "COURSE_ID"
+        const val ARG_COURSE_ID = "courseId"
 
         fun newInstance(courseId: String): CourseFragment {
             val fragment = CourseFragment()
@@ -62,6 +63,10 @@ class CourseFragment : Fragment() {
         binding.courseRecyclerView.adapter = adapter
 
         val courseId = arguments?.getString(ARG_COURSE_ID) ?: return
+        if (courseId == null) {
+            Log.d("CourseFragment", "courseId is null! Arguments: $arguments")
+            return
+        }
 
         val courseApi = ApiClient.createServiceWithToken(
             CourseApi::class.java
@@ -89,11 +94,7 @@ class CourseFragment : Fragment() {
 
         course.units.forEachIndexed { index, unit ->
 
-            val state = when {
-//                unit.isCompleted -> UnitState.COMPLETED
-//                unit.isCurrent -> UnitState.CURRENT
-                else -> UnitState.LOCKED
-            }
+            val state = UnitState.CURRENT
 
             items.add(
                 CourseItem.Unit(

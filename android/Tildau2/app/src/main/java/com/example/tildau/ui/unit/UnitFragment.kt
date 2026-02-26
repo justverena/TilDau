@@ -27,7 +27,7 @@ class UnitFragment : Fragment() {
     private lateinit var exerciseApi: ExerciseApi
 
     companion object {
-        private const val ARG_UNIT = "ARG_UNIT"
+        const val ARG_UNIT = "ARG_UNIT"
 
         fun newInstance(unit: UnitResponse): UnitFragment {
             val fragment = UnitFragment()
@@ -65,11 +65,8 @@ class UnitFragment : Fragment() {
     }
 
     private fun fetchFullExerciseAndOpenRecord(exerciseId: String) {
-        val bundle = bundleOf("exerciseId" to exerciseId)
-        findNavController().navigate(
-            R.id.action_coursesFragment_to_unitFragment,
-            bundle
-        )
+        val bundle = bundleOf("ARG_EXERCISE_ID" to exerciseId)
+        findNavController().navigate(R.id.action_unitFragment_to_recordFragment, bundle)
     }
 
 

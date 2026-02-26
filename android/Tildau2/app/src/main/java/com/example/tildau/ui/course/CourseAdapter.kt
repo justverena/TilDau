@@ -1,15 +1,18 @@
 package com.example.tildau.ui.course
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tildau.R
 import com.example.tildau.data.enums.UnitState
 import com.example.tildau.data.model.course.UnitResponse
+import com.example.tildau.ui.unit.UnitFragment
 import com.google.android.material.card.MaterialCardView
 
 class CourseAdapter(
@@ -143,7 +146,10 @@ class CourseAdapter(
 
             itemView.setOnClickListener {
                 if (item.state != UnitState.LOCKED) {
-                    onUnitClick?.invoke(item.unitResponse)
+                    val bundle = Bundle()
+                    bundle.putSerializable(UnitFragment.ARG_UNIT, item.unitResponse)
+                    androidx.navigation.Navigation.findNavController(itemView)
+                        .navigate(R.id.action_courseFragment_to_unitFragment, bundle)
                 }
             }
         }
