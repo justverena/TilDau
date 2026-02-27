@@ -27,9 +27,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as androidx.navigation.fragment.NavHostFragment
         val navController = navHostFragment.navController
 
-        if (savedInstanceState == null) {
-            navController.navigate(R.id.resultFragment)
-        }
+
 
         tapbarBinding.btnStats.setOnClickListener {
             navController.navigate(R.id.resultFragment)

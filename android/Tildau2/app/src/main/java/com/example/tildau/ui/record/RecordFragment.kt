@@ -89,9 +89,30 @@ class RecordFragment : Fragment() {
 
                 binding.exerciseTitle.text = exercise.title
                 binding.exerciseInstructionText.text = exercise.instruction
-                binding.expectedText.text = exercise.expectedText ?: ""
 
-                setupListenButton()
+                val hasAudio = !exercise.referenceAudioUrl.isNullOrEmpty()
+                val hasText = !exercise.expectedText.isNullOrEmpty()
+
+// 🔹 Если есть текст упражнения
+                if (hasText) {
+                    binding.expectedText.visibility = View.VISIBLE
+                    binding.expectedText.text = exercise.expectedText
+                } else {
+                    // Если текста нет, но есть аудио — показываем подсказку
+                    binding.expectedText.visibility = View.VISIBLE
+                    binding.expectedText.text = "Listen to the audio"
+                }
+
+// 🔹 Если есть аудио — показываем кнопку
+                if (hasAudio) {
+                    binding.btnListen.visibility = View.VISIBLE
+                    setupListenButton()
+                } else {
+                    // Если аудио нет — полностью скрываем кнопку
+                    binding.btnListen.visibility = View.GONE
+                }
+
+
             } catch (e: Exception) {
                 Log.e("RecordFragment", "Failed to load exercise", e)
                 Toast.makeText(requireContext(), "Failed to load exercise", Toast.LENGTH_SHORT).show()

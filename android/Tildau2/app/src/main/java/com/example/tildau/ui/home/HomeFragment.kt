@@ -30,15 +30,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.accountFragment)
         }
 
-        binding.btnOpenRecorder.setOnClickListener {
-            val bundle = bundleOf()
-            findNavController().navigate(R.id.recordFragment, bundle)
-        }
 
-        binding.btnLoadingTest.setOnClickListener {
-            val bundle = bundleOf()
-            findNavController().navigate(R.id.analyzeFragment, bundle)
-        }
     }
 
     override fun onDestroyView() {

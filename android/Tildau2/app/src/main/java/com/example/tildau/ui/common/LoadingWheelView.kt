@@ -27,7 +27,7 @@ class LoadingWheelView @JvmOverloads constructor(
     init {
         paint.style = Paint.Style.STROKE
         paint.strokeCap = Paint.Cap.ROUND
-        paint.strokeWidth = 14f
+        paint.strokeWidth = 15f
 
         val baseColor = 0xFF6C47EC.toInt()
         for (i in 0 until numberOfBars) {
@@ -65,7 +65,7 @@ class LoadingWheelView @JvmOverloads constructor(
                 cx,
                 cy - radius,
                 cx,
-                cy - radius * 0.5f,
+                cy - radius * 0.6f,
                 paint)
             canvas.restore()
         }

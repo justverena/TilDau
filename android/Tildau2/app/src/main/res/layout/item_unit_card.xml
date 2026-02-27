@@ -47,25 +47,31 @@
             android:textStyle="bold"
             android:textColor="#333333"
             android:layout_marginStart="16dp"
+            android:maxLines="2"
+            android:ellipsize="end"
             app:layout_constraintStart_toEndOf="@id/numberContainer"
-            app:layout_constraintTop_toTopOf="@id/numberContainer"
-            app:layout_constraintEnd_toStartOf="@id/stateIcon"/>
+            app:layout_constraintEnd_toStartOf="@id/stateIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/statusContainer"/>
 
-        <!-- Нижняя строка (статус) -->
+        <!-- Статус -->
         <LinearLayout
             android:id="@+id/statusContainer"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
             app:layout_constraintStart_toEndOf="@id/numberContainer"
-            app:layout_constraintBottom_toBottomOf="@id/numberContainer">
+            app:layout_constraintEnd_toStartOf="@id/stateIcon"
+            app:layout_constraintTop_toBottomOf="@id/unitTitle"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <TextView
                 android:id="@+id/statusPrimary"
                 android:textSize="10sp"
                 android:textStyle="italic"
-                android:textColor="#000000"
+                android:textColor="#666666"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -73,7 +79,7 @@
                 android:id="@+id/statusSecondary"
                 android:textSize="10sp"
                 android:textStyle="italic"
-                android:textColor="#000000"
+                android:textColor="#666666"
                 android:layout_marginStart="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

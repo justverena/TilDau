@@ -26,8 +26,6 @@ class AnalyzeFragment : Fragment() {
 
     private var audioPath: String = ""
     private var exerciseId: String = ""
-    private var title: String? = null
-    private var subtitle: String? = null
 
     // флаг для защиты back во время загрузки
     private var isLoading = false
@@ -42,9 +40,7 @@ class AnalyzeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Получаем аргументы
-        title = arguments?.getString("title")
-        subtitle = arguments?.getString("subtitle")
+
         audioPath = arguments?.getString("audioPath") ?: ""
         exerciseId = arguments?.getString("exerciseId") ?: ""
 
@@ -54,9 +50,8 @@ class AnalyzeFragment : Fragment() {
             return
         }
 
-        // Настраиваем LoadingView
-        binding.loadingView.setTitle(title)
-        binding.loadingView.setSubtitle(subtitle)
+        binding.loadingView.setTitle("Analyzing your speech...")
+        binding.loadingView.setSubtitle("This may take a few minutes.")
 
         // Toolbar back button
         binding.toolbar.setNavigationOnClickListener {
