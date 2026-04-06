@@ -27,18 +27,9 @@ public class ExerciseController {
             @AuthenticationPrincipal CustomerUserDetails userDetails,
             @PathVariable("id") UUID exerciseId
     ) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         UUID userId = userDetails.getUser().getId();
-
-        try {
-            ExerciseFullResponse exercise = exerciseService.getExercise(userId, exerciseId);
-            return ResponseEntity.ok(exercise);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        ExerciseFullResponse exercise = exerciseService.getExercise(userId, exerciseId);
+        return ResponseEntity.ok(exercise);
     }
 
     @PostMapping("/{id}/submit")
@@ -47,10 +38,6 @@ public class ExerciseController {
             @PathVariable("id") UUID exerciseId,
             @RequestParam("file") MultipartFile file
     ) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         SubmitExerciseResponse response = exerciseService.submitExercise(userDetails.getUser().getId(), exerciseId, file);
         return ResponseEntity.ok(response);
     }

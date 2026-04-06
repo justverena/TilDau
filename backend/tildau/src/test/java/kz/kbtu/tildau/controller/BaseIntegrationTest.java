@@ -224,10 +224,12 @@ public abstract class BaseIntegrationTest {
             user_id, course_id,
             completed_units,
             total_units,
-            progress_percent
+            progress_percent,
+            started_at,
+            finished_at
         )
-        VALUES (?::uuid, ?::uuid, 0, 1, 0)
-    """, userId, courseId);
+        VALUES (?::uuid, ?::uuid, 0, 1, 0, now(), NULL)
+    """, UUID.fromString(userId.toString()), UUID.fromString(courseId.toString()));
 
         jdbcTemplate.update("""
         INSERT INTO user_unit_progress (
@@ -237,6 +239,34 @@ public abstract class BaseIntegrationTest {
             is_completed
         )
         VALUES (?::uuid, ?::uuid, 0, 1, false)
+    """, UUID.fromString(userId.toString()), UUID.fromString(unitId.toString()));
+    }
+
+    protected int courseProgressCount(UUID userId, UUID courseId) {
+        return jdbcTemplate.queryForObject("""
+        SELECT COUNT(*) FROM user_course_progress
+        WHERE user_id = ? AND course_id = ?
+    """, Integer.class, userId, courseId);
+    }
+    protected int unitProgressCount(UUID userId, UUID unitId) {
+        return jdbcTemplate.queryForObject("""
+        SELECT COUNT(*) FROM user_unit_progress
+        WHERE user_id = ? AND unit_id = ?
+    """, Integer.class, userId, unitId);
+    }
+
+    protected int totalUnitsCount(UUID userId, UUID courseId) {
+        return jdbcTemplate.queryForObject("""
+        SELECT total_units FROM user_course_progress
+        WHERE user_id = ? AND course_id = ?
+    """, Integer.class, userId, courseId);
+    }
+
+    protected void markUnitCompleted() {
+        jdbcTemplate.update("""
+        UPDATE user_unit_progress
+        SET is_completed = true
+        WHERE user_id = ? AND unit_id = ?
     """, userId, unitId);
     }
 

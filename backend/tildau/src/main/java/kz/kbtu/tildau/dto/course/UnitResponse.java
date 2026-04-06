@@ -14,5 +14,6 @@ public class UnitResponse {
     private UUID id;
     private String title;
     private String description;
+    private boolean isCompleted;
     private List<ExerciseResponse> exercises;
 }

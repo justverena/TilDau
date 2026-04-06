@@ -14,4 +14,6 @@ public class ExerciseResponse {
     private UUID id;
     private String title;
     private String instruction;
+    private boolean isCompleted;
+    private boolean isLocked;
 }

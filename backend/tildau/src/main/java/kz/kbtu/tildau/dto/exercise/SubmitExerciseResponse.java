@@ -1,5 +1,6 @@
 package kz.kbtu.tildau.dto.exercise;
 
+import kz.kbtu.tildau.dto.nextStep.NextStepResponse;
 import lombok.*;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public class SubmitExerciseResponse {
     private UUID attemptId;
     private int overallScore;
     private List<String> feedback;
+    private NextStepResponse nextStep;
 }

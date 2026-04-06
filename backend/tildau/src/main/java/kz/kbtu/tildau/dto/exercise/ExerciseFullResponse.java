@@ -1,10 +1,7 @@
 package kz.kbtu.tildau.dto.exercise;
 
 import kz.kbtu.tildau.enums.ExerciseType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -12,6 +9,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Builder
 public class ExerciseFullResponse {
     private UUID id;
     private String title;
@@ -19,5 +17,7 @@ public class ExerciseFullResponse {
     private ExerciseType exerciseType;
     private String expectedText;
     private String referenceAudioUrl;
+
+
 }
  

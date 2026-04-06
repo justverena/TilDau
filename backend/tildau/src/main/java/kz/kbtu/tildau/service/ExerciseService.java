@@ -1,12 +1,13 @@
 package kz.kbtu.tildau.service;
 
 import kz.kbtu.tildau.dto.ai.AnalyzeResponse;
+import kz.kbtu.tildau.dto.nextStep.NextStepResponse;
 import kz.kbtu.tildau.dto.exercise.ExerciseFullResponse;
-import kz.kbtu.tildau.dto.exercise.SubmitExerciseRequest;
 import kz.kbtu.tildau.dto.exercise.SubmitExerciseResponse;
 import kz.kbtu.tildau.entity.*;
 import kz.kbtu.tildau.enums.ExerciseStatus;
 import kz.kbtu.tildau.enums.ExerciseType;
+import kz.kbtu.tildau.enums.NextStepType;
 import kz.kbtu.tildau.exception.NotFoundException;
 import kz.kbtu.tildau.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class ExerciseService {
     private final UserDefectTypeRepository userDefectTypeRepository;
     private final AiService aiService;
     private final ProgressService progressService;
+    private final NextStepService nextStepService;
 
     private static final int PASS_THRESHOLD = 85;
 
@@ -35,14 +37,14 @@ public class ExerciseService {
         User user = getUserOrThrow(userId);
         UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
         Exercise exercise =  getExerciseOrThrow(exerciseId, userDefectType.getDefectType().getId());
+        progressService.validateExerciseAccess(user, exercise);
 
-//        progressService.validateExerciseAccess(user, exercise);
-
-        ExerciseFullResponse response = new ExerciseFullResponse();
-        response.setId(exercise.getId());
-        response.setTitle(exercise.getTitle());
-        response.setInstruction(exercise.getInstruction());
-        response.setExerciseType(exercise.getExerciseType());
+        ExerciseFullResponse response = ExerciseFullResponse.builder()
+                .id(exercise.getId())
+                .title(exercise.getTitle())
+                .instruction(exercise.getInstruction())
+                .exerciseType(exercise.getExerciseType())
+                .build();
 
         if(exercise.getExerciseType() == ExerciseType.READ_ALOUD){
             response.setExpectedText(exercise.getExpectedText());
@@ -51,62 +53,70 @@ public class ExerciseService {
             if (exercise.getReferenceAudioUrl() != null) {
                 response.setReferenceAudioUrl(minioService.getPresignedUrl(exercise.getReferenceAudioUrl()));
                 response.setExpectedText(null);
-
+            } else {
+                throw new NotFoundException("Reference audio not found");
             }
         }
+
         return response;
     }
 
     @Transactional
     public SubmitExerciseResponse submitExercise(UUID userId, UUID exerciseId, MultipartFile multipartFile) {
+        User user = getUserOrThrow(userId);
+        UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
+        Exercise exercise = getExerciseOrThrow(exerciseId, userDefectType.getDefectType().getId());
+        progressService.validateExerciseAccess(user, exercise);
+
+        byte[] audioBytes = extractAudioBytes(multipartFile);
+        String objectKey = uploadToStorage(user, exercise, audioBytes);
+
+        UserExercise attempt = createAttempt(user, exercise, objectKey);
+
         try {
-            User user = getUserOrThrow(userId);
-            UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
-            Exercise exercise = getExerciseOrThrow(exerciseId, userDefectType.getDefectType().getId());
+            AnalyzeResponse aiResponse = aiService.analyze(audioBytes, exercise.getExpectedText());
 
-            //        progressService.validateExerciseAccess(user, exercise);
-
-            byte[] audioBytes = extractAudioBytes(multipartFile);
-            String objectKey = uploadToStorage(user, exercise, audioBytes);
-
-            UserExercise attempt = createAttempt(user, exercise, objectKey);
-
-            try {
-                AnalyzeResponse aiResponse = aiService.analyze(audioBytes, exercise.getExpectedText());
-
-                if (aiResponse == null) {
-                    failAttempt(attempt);
-                    throw new RuntimeException("AI module returned null");
-                }
-
-                saveAnalysisResult(attempt, aiResponse);
-                completeAttempt(attempt);
-
-                //            if (aiResponse.getOverallScore()>= PASS_THRESHOLD){
-                //                progressService.handleSuccessfulAttempt(user, exercise);
-                //            }
-
-                return SubmitExerciseResponse.builder()
-                        .attemptId(attempt.getId())
-                        .overallScore(aiResponse.getOverallScore())
-                        .feedback(aiResponse.getFeedback())
-                        .build();
-
-            } catch (Exception e) {
-                failAttempt(attempt);
-                throw e;
+            if (aiResponse == null) {
+                throw new RuntimeException("AI module returned null");
             }
+
+            saveAnalysisResult(attempt, aiResponse);
+            boolean passed = aiResponse.getOverallScore() >= PASS_THRESHOLD;
+            NextStepResponse nextStep;
+
+            if (passed) {
+                completeAttempt(attempt);
+                progressService.handleSuccessfulAttempt(user, exercise);
+                nextStep = nextStepService.getNextStepAfterExercise(userId, exercise);
+            } else {
+                failAttempt(attempt);
+                nextStep = retryExercise(exerciseId);
+            }
+
+            return submitResponse(attempt, aiResponse, nextStep);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            if (attempt.getStatus() == ExerciseStatus.PENDING) {
+                failAttempt(attempt);
+            }
             throw e;
         }
-
     }
 
-    private void completeAttempt(UserExercise attempt) {
-        attempt.setStatus(ExerciseStatus.COMPLETED);
-        attempt.setCompletedAt(LocalDateTime.now());
-        userExerciseRepository.save(attempt);
+    private SubmitExerciseResponse submitResponse(UserExercise attempt, AnalyzeResponse aiResponse, NextStepResponse nextStep) {
+        return SubmitExerciseResponse.builder()
+                .attemptId(attempt.getId())
+                .overallScore(aiResponse.getOverallScore())
+                .feedback(aiResponse.getFeedback())
+                .nextStep(nextStep)
+                .build();
+    }
+
+    private NextStepResponse retryExercise(UUID exerciseId) {
+        return NextStepResponse.builder()
+                .type(NextStepType.RETRY)
+                .id(exerciseId)
+                .build();
     }
 
     private void saveAnalysisResult(UserExercise attempt, AnalyzeResponse aiResponse) {
@@ -126,8 +136,14 @@ public class ExerciseService {
             aiAnalysisResultRepository.save(result);
     }
 
+    private void completeAttempt(UserExercise attempt) {
+        attempt.setStatus(ExerciseStatus.COMPLETED);
+        attempt.setCompletedAt(LocalDateTime.now());
+        userExerciseRepository.save(attempt);
+    }
     private void failAttempt(UserExercise attempt) {
         attempt.setStatus(ExerciseStatus.FAILED);
+        attempt.setCompletedAt(LocalDateTime.now());
         userExerciseRepository.save(attempt);
     }
 

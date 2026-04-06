@@ -17,11 +17,12 @@ public class UserUnitProgress {
     @EmbeddedId
     private UserUnitProgressId id;
 
-    @MapsId
-    @OneToOne
+    @MapsId("userId")
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @MapsId("unitId")
     @ManyToOne
     @JoinColumn(name = "unit_id")
     private Unit unit;
@@ -34,4 +35,5 @@ public class UserUnitProgress {
 
     @Column(name = "is_completed")
     private boolean isCompleted;
+
 }

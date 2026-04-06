@@ -2,9 +2,11 @@ package kz.kbtu.tildau.controller;
 
 import kz.kbtu.tildau.dto.course.CourseFullResponse;
 import kz.kbtu.tildau.dto.course.CourseShortResponse;
+import kz.kbtu.tildau.dto.nextStep.NextStepResponse;
 import kz.kbtu.tildau.security.CustomerUserDetails;
 import kz.kbtu.tildau.service.CourseService;
-import org.springframework.http.HttpStatus;
+import kz.kbtu.tildau.service.NextStepService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -12,24 +14,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
 
     private final CourseService courseService;
-
-    public CourseController(CourseService courseService) {
-        this.courseService = courseService;
-    }
+    private final NextStepService nextStepService;
 
     @GetMapping
     public ResponseEntity<List<CourseShortResponse>> getCourses(
-            @AuthenticationPrincipal CustomerUserDetails userDetails
-    ) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
+            @AuthenticationPrincipal CustomerUserDetails userDetails) {
         UUID userId = userDetails.getUser().getId();
         List<CourseShortResponse> courses = courseService.getCoursesForUser(userId);
         return ResponseEntity.ok(courses);
@@ -38,18 +33,32 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<CourseFullResponse> getCourseById(
             @AuthenticationPrincipal CustomerUserDetails userDetails,
-            @PathVariable("id") UUID courseId
-    ) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+            @PathVariable("id") UUID courseId) {
 
         UUID userId = userDetails.getUser().getId();
-        try {
-            CourseFullResponse course = courseService.getCourseForUser(userId, courseId);
-            return ResponseEntity.ok(course);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        CourseFullResponse course = courseService.getCourseForUser(userId, courseId);
+        return ResponseEntity.ok(course);
     }
+
+    @PostMapping("/{id}/start")
+    public ResponseEntity<NextStepResponse> startCourse(
+            @AuthenticationPrincipal CustomerUserDetails userDetails,
+            @PathVariable("id") UUID courseId) {
+
+        UUID userId = userDetails.getUser().getId();
+
+        NextStepResponse response = courseService.startCourse(userId, courseId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/resume")
+    public ResponseEntity<NextStepResponse> getNextStep(
+            @AuthenticationPrincipal CustomerUserDetails userDetails,
+            @PathVariable UUID id
+    ) {
+        UUID userId = userDetails.getUser().getId();
+        return ResponseEntity.ok(nextStepService.getNextStep(userId, id));
+    }
+
 }

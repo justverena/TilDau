@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ExerciseRepository extends JpaRepository<Exercise, UUID> {
-    List<Exercise> findByUnitId(UUID unitId);
+    List<Exercise> findByUnitIdOrderByOrderIndex(UUID unitId);
     Optional<Exercise> findByIdAndUnit_Course_DefectType_Id(UUID id, Integer defectTypeId);
+    List<Exercise> findByUnitIdInOrderByOrderIndex(List<UUID> unitIds);
 }
