@@ -28,14 +28,18 @@ public class NextStepService {
     public NextStepResponse getNextStep(UUID userId, UUID courseId) {
         List<Unit> units = unitRepository.findByCourseIdOrderByOrderIndex(courseId);
         UnitWithProgress next = findNextUnit(userId, units);
+
+        if (next == null) {
+            return buildNextStepResponse(NextStepType.FINISH, null);
+        }
+
         Map<UUID, List<Exercise>> exercisesMap = getExercisesMap(units);
         List<Exercise> exercises = exercisesMap.getOrDefault(next.unit().getId(), List.of());
         UUID nextExerciseId = findNextExerciseInUnit(next.progress(), exercises);
-        return NextStepResponse.builder()
-                .type(NextStepType.EXERCISE)
-                .id(nextExerciseId)
-                .build();
+        return buildNextStepResponse(NextStepType.EXERCISE, nextExerciseId);
     }
+
+
 
     public NextStepResponse getNextStepAfterExercise(UUID userId, Exercise exercise) {
         Unit currentUnit = exercise.getUnit();
@@ -43,29 +47,20 @@ public class NextStepService {
         List<Exercise> currentExercises = exerciseRepository.findByUnitIdOrderByOrderIndex(currentUnit.getId());
         if (!progress.isCompleted()) {
             UUID nextExerciseId = findNextExerciseInUnit(progress, currentExercises);
-            return NextStepResponse.builder()
-                    .type(NextStepType.EXERCISE)
-                    .id(nextExerciseId)
-                    .build();
+            return buildNextStepResponse(NextStepType.EXERCISE, nextExerciseId);
         }
         List<Unit> units = unitRepository.findByCourseIdOrderByOrderIndex(currentUnit.getCourse().getId());
         Unit nextUnit = findNextUnitAfter(currentUnit, units);
 
         if (nextUnit == null) {
-            return NextStepResponse.builder()
-                    .type(NextStepType.FINISH)
-                    .id(null)
-                    .build();
+            return buildNextStepResponse(NextStepType.FINISH, null);
         }
 
         UserUnitProgress nextUnitProgress = getUnitProgressOrThrow(userId, nextUnit.getId());
         List<Exercise> nextExercises = exerciseRepository.findByUnitIdOrderByOrderIndex(nextUnit.getId());
         UUID nextExerciseId = findNextExerciseInUnit(nextUnitProgress, nextExercises);
 
-        return NextStepResponse.builder()
-                .type(NextStepType.EXERCISE)
-                .id(nextExerciseId)
-                .build();
+        return buildNextStepResponse(NextStepType.EXERCISE, nextExerciseId);
     }
 
     private Unit findNextUnitAfter(Unit currentUnit, List<Unit> units) {
@@ -94,7 +89,7 @@ public class NextStepService {
                 })
                 .filter(up -> !up.progress().isCompleted())
                 .findFirst()
-                .orElseThrow(() -> new ForbiddenException("Course already completed"));
+                .orElse(null);
     }
 
     private Map<UUID, UserUnitProgress> getProgressMap(UUID userId, List<Unit> units) {
@@ -137,5 +132,11 @@ public class NextStepService {
         return userUnitProgressRepository
                 .findByUserIdAndUnitId(userId, unitId)
                 .orElseThrow(() -> new NotFoundException("Unit progress not found"));
+    }
+    private NextStepResponse buildNextStepResponse(NextStepType nextStepType, UUID nextExerciseId) {
+        return NextStepResponse.builder()
+                .type(nextStepType)
+                .id(nextExerciseId)
+                .build();
     }
 }

@@ -52,13 +52,4 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}/resume")
-    public ResponseEntity<NextStepResponse> getNextStep(
-            @AuthenticationPrincipal CustomerUserDetails userDetails,
-            @PathVariable UUID id
-    ) {
-        UUID userId = userDetails.getUser().getId();
-        return ResponseEntity.ok(nextStepService.getNextStep(userId, id));
-    }
-
 }

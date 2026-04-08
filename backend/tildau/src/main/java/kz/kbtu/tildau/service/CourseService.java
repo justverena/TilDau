@@ -67,66 +67,7 @@ public class CourseService {
         );
     }
 
-    private List<UnitResponse> getUnitsWithProgress(UUID userId, UUID courseId) {
-        List<Unit> units = unitRepository.findByCourseIdOrderByOrderIndex(courseId);
-
-        List<UUID> unitIds = units.stream()
-                .map(Unit::getId)
-                .toList();
-
-        Map<UUID, UserUnitProgress> progressMap =
-                userUnitProgressRepository
-                        .findByUserIdAndUnitIdIn(userId, unitIds)
-                        .stream()
-                        .collect(Collectors.toMap(
-                                p -> p.getUnit().getId(),
-                                Function.identity()
-                        ));
-
-        Map<UUID, List<Exercise>> exercisesMap =
-                exerciseRepository
-                        .findByUnitIdInOrderByOrderIndex(unitIds)
-                        .stream()
-                        .collect(Collectors.groupingBy(
-                                ex -> ex.getUnit().getId()
-                        ));
-
-        return units.stream()
-                .map(unit -> {
-                    UserUnitProgress progress = progressMap.get(unit.getId());
-                    List<Exercise> exercises = exercisesMap.getOrDefault(unit.getId(), List.of());
-                    List<ExerciseResponse> exerciseResponses =
-                            buildExerciseResponses(exercises, progress);
-                    return new UnitResponse(
-                            unit.getId(),
-                            unit.getTitle(),
-                            unit.getDescription(),
-                            progress != null && progress.isCompleted(),
-                            exerciseResponses
-                    );
-                })
-                .toList();
-    }
-
-    private List<ExerciseResponse> buildExerciseResponses(List<Exercise> exercises, UserUnitProgress progress) {
-        int completed = progress != null ? progress.getCompletedExercises() : 0;
-
-        return exercises.stream()
-                .map(ex -> {
-                    boolean isCompleted = ex.getOrderIndex() <= completed;
-                    boolean isLocked = ex.getOrderIndex() > completed + 1;
-                    return new ExerciseResponse(
-                            ex.getId(),
-                            ex.getTitle(),
-                            ex.getInstruction(),
-                            isCompleted,
-                            isLocked
-                    );
-                })
-                .toList();
-    }
-
-    @Transactional
+   @Transactional
     public NextStepResponse startCourse(UUID userId, UUID courseId) {
         User user = getUserOrThrow(userId);
         UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
@@ -159,6 +100,64 @@ public class CourseService {
             unitProgress.setCompleted(false);
             userUnitProgressRepository.save(unitProgress);
         }
+    }
+
+    private List<UnitResponse> getUnitsWithProgress(UUID userId, UUID courseId) {
+        List<Unit> units = unitRepository.findByCourseIdOrderByOrderIndex(courseId);
+
+        List<UUID> unitIds = units.stream()
+                .map(Unit::getId)
+                .toList();
+
+        Map<UUID, UserUnitProgress> progressMap =
+                userUnitProgressRepository
+                        .findByUserIdAndUnitIdIn(userId, unitIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                p -> p.getUnit().getId(),
+                                Function.identity()
+                        ));
+
+        Map<UUID, List<Exercise>> exercisesMap =
+                exerciseRepository
+                        .findByUnitIdInOrderByOrderIndex(unitIds)
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                ex -> ex.getUnit().getId()
+                        ));
+
+        return units.stream()
+                .map(unit -> {
+                    UserUnitProgress progress = progressMap.get(unit.getId());
+                    List<Exercise> exercises = exercisesMap.getOrDefault(unit.getId(), List.of());
+                    List<ExerciseResponse> exerciseResponses = buildExerciseResponses(exercises, progress);
+                    return new UnitResponse(
+                            unit.getId(),
+                            unit.getTitle(),
+                            unit.getDescription(),
+                            progress != null && progress.isCompleted(),
+                            exerciseResponses
+                    );
+                })
+                .toList();
+    }
+
+    private List<ExerciseResponse> buildExerciseResponses(List<Exercise> exercises, UserUnitProgress progress) {
+        int completed = progress != null ? progress.getCompletedExercises() : 0;
+
+        return exercises.stream()
+                .map(ex -> {
+                    boolean isCompleted = ex.getOrderIndex() <= completed;
+                    boolean isLocked = ex.getOrderIndex() > completed + 1;
+                    return new ExerciseResponse(
+                            ex.getId(),
+                            ex.getTitle(),
+                            ex.getInstruction(),
+                            isCompleted,
+                            isLocked
+                    );
+                })
+                .toList();
     }
 
     private void createCourseProgress(User user, Course course, List<Unit> units) {

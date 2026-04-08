@@ -188,15 +188,15 @@ public abstract class BaseIntegrationTest {
         """, otherUnitId, otherCourseId);
     }
 
-    protected UUID insertExercise(UUID unitId) {
-
+    protected UUID insertExercise(UUID unitId, int orderIndex) {
         UUID exerciseId = UUID.randomUUID();
         jdbcTemplate.update("""
         INSERT INTO exercises (id, unit_id, exercise_type, title, instruction, expected_text, order_index, created_at)
-        VALUES (?, ?, 'READ_ALOUD', 'title', 'instruction', 'text', 1, now())
+        VALUES (?, ?, 'READ_ALOUD', 'title', 'instruction', 'text', ?, now())
     """,
                 exerciseId,
-                unitId
+                unitId,
+                orderIndex
         );
         return exerciseId;
     }
@@ -218,7 +218,7 @@ public abstract class BaseIntegrationTest {
         return exerciseId;
     }
 
-    void insertProgress() {
+    void insertProgress(int totalExercises) {
         jdbcTemplate.update("""
         INSERT INTO user_course_progress (
             user_id, course_id,
@@ -238,8 +238,8 @@ public abstract class BaseIntegrationTest {
             total_exercises,
             is_completed
         )
-        VALUES (?::uuid, ?::uuid, 0, 1, false)
-    """, UUID.fromString(userId.toString()), UUID.fromString(unitId.toString()));
+        VALUES (?::uuid, ?::uuid, 0, ?, false)
+    """, UUID.fromString(userId.toString()), UUID.fromString(unitId.toString()), totalExercises);
     }
 
     protected int courseProgressCount(UUID userId, UUID courseId) {
@@ -270,6 +270,26 @@ public abstract class BaseIntegrationTest {
     """, userId, unitId);
     }
 
+    protected void markExerciseCompleted() {
+        jdbcTemplate.update("""
+        UPDATE user_unit_progress
+        SET completed_exercises = 1
+        WHERE user_id = ? AND unit_id = ?
+    """, userId, unitId);
+    }
+    protected int getAttemptCount(UUID exerciseId) {
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM user_exercises WHERE exercise_id = ?",
+                Integer.class,
+                exerciseId
+        );
+    }
+    protected int completedExercisesCount(UUID userId, UUID unitId) {
+        return jdbcTemplate.queryForObject("""
+        SELECT completed_exercises FROM user_unit_progress
+        WHERE user_id = ? AND unit_id = ?
+    """, Integer.class, userId, unitId);
+    }
     protected String loginAndGetToken() throws Exception {
 
         LoginRequest request = new LoginRequest();

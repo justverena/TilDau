@@ -44,9 +44,6 @@ public class AiService {
             ResponseEntity<AnalyzeResponse> response = restTemplate.postForEntity(
                     aiModuleUrl, request, AnalyzeResponse.class);
 
-            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                throw new RuntimeException("AI module returned error or empty response");
-            }
             return response.getBody();
         } catch (Exception e) {
             throw new RuntimeException("Failed to analyze AI module", e);

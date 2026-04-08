@@ -8,6 +8,7 @@ import kz.kbtu.tildau.entity.*;
 import kz.kbtu.tildau.enums.ExerciseStatus;
 import kz.kbtu.tildau.enums.ExerciseType;
 import kz.kbtu.tildau.enums.NextStepType;
+import kz.kbtu.tildau.exception.ForbiddenException;
 import kz.kbtu.tildau.exception.NotFoundException;
 import kz.kbtu.tildau.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -181,7 +182,7 @@ public class ExerciseService {
     private Exercise getExerciseOrThrow(UUID exerciseId, Integer userDefectTypeId) {
         return exerciseRepository
                 .findByIdAndUnit_Course_DefectType_Id(exerciseId, userDefectTypeId)
-                .orElseThrow(() -> new RuntimeException("Exercise does not belong to user's defect type"));
+                .orElseThrow(() -> new ForbiddenException("Exercise does not belong to user's defect type"));
     }
 
     private User getUserOrThrow(UUID userId) {

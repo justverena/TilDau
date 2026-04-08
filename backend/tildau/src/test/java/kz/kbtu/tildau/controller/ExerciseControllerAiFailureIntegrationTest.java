@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,10 +34,10 @@ class ExerciseControllerAiFailureIntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void insertExercises() {
 
-        exerciseId = insertExercise(unitId);
-        otherExerciseId = insertExercise(otherUnitId);
+        exerciseId = insertExercise(unitId, 1);
+        otherExerciseId = insertExercise(otherUnitId, 1);
 
-        insertProgress();
+        insertProgress(1);
     }
 
     @TestConfiguration
@@ -55,7 +56,8 @@ class ExerciseControllerAiFailureIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void submitExercise_AiThrowsException_SetsFailed() throws Exception {
+    void submitExercise_AiThrowsException() throws Exception {
+
         String token = loginAndGetToken();
 
         MockMultipartFile file =
@@ -65,5 +67,10 @@ class ExerciseControllerAiFailureIntegrationTest extends BaseIntegrationTest {
                         .file(file)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isInternalServerError());
+
+
+        Integer count = getAttemptCount(exerciseId);
+
+        assertEquals(0, count);
     }
 }
