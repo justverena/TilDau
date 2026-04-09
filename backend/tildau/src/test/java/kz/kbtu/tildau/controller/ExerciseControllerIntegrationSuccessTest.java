@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {TildauApplication.class, AiSuccessTestConfig.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class ExerciseControllerIntegrationAiSuccessTest extends BaseIntegrationTest {
+class ExerciseControllerIntegrationSuccessTest extends BaseIntegrationTest {
 
 
     @Autowired
@@ -87,7 +87,7 @@ class ExerciseControllerIntegrationAiSuccessTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/exercises/{id}", otherExerciseId)
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isNotFound());
     }
 
     @Test

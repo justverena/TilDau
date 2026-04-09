@@ -21,12 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {TildauApplication.class, AiFailThresholdConfig.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class ExerciseControllerIntegrationAiFailThresholdTest extends BaseIntegrationTest {
-
-
-    @Autowired
-    private MinioService minioService;
-
+class ExerciseControllerIntegrationFailThresholdTest extends BaseIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 

@@ -3,6 +3,7 @@ package kz.kbtu.tildau.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kz.kbtu.tildau.dto.auth.LoginRequest;
 import kz.kbtu.tildau.dto.auth.RegisterRequest;
+import kz.kbtu.tildau.dto.user.SetUserDefectsRequest;
 import kz.kbtu.tildau.dto.user.UpdateProfileRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -265,4 +266,56 @@ public class UserControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Profile deleted successfully"));
     }
+
+    @Test
+    void setDefects_success() throws Exception {
+        SetUserDefectsRequest request = new SetUserDefectsRequest();
+        request.setDefectTypeId(1);
+
+        mockMvc.perform(post("/api/me/defects")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/me/defects/status")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hasDefects").value(true));
+    }
+
+    @Test
+    void hasDefects_false_when_none_assigned() throws Exception {
+        mockMvc.perform(get("/api/me/defects/status")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hasDefects").value(false));
+    }
+
+    @Test
+    void setDefects_fails_without_token() throws Exception {
+        SetUserDefectsRequest request = new SetUserDefectsRequest();
+        request.setDefectTypeId(1);
+
+        mockMvc.perform(post("/api/me/defects")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void hasDefects_fails_without_token() throws Exception {
+        mockMvc.perform(get("/api/me/defects/status"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getDefectTypes_success() throws Exception {
+
+        mockMvc.perform(get("/api/defect-types"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").exists())
+                .andExpect(jsonPath("$[1].name").exists());
+    }
+
 }

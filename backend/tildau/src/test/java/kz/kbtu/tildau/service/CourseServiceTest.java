@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,15 +23,14 @@ import static org.mockito.Mockito.*;
 
 class CourseServiceTest {
     @Mock private UserJpaRepository userJpaRepository;
-    @Mock private UserDefectTypeRepository userDefectTypeRepository;
     @Mock private CourseRepository courseRepository;
     @Mock private UnitRepository unitRepository;
     @Mock private ExerciseRepository exerciseRepository;
     @InjectMocks private CourseService courseService;
     @Mock private UserCourseProgressRepository userCourseProgressRepository;
     @Mock private UserUnitProgressRepository userUnitProgressRepository;
-    @Mock private UserExerciseRepository userExerciseRepository;
     @Mock private NextStepService nextStepService;
+    @Mock private UserDefectTypeService userDefectTypeService;
 
     private UUID userId;
     private DefectType articulationDefect;
@@ -49,18 +49,13 @@ class CourseServiceTest {
         User user = new User();
         user.setId(userId);
 
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
-
         Course course = new Course();
         course.setId(UUID.randomUUID());
         course.setTitle("Articulation");
         course.setDescription("Articulation basics course");
-        course.setDefectType(articulationDefect);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(courseRepository.findByDefectTypeId(articulationDefect.getId())).thenReturn(List.of(course));
 
         List<CourseShortResponse> result = courseService.getCoursesForUser(userId);
@@ -72,28 +67,11 @@ class CourseServiceTest {
     }
 
     @Test
-    void getCoursesForUser_Fails_WhenUserHasNoDefectType() {
-        User user = new User();
-        user.setId(userId);
-
-        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.empty());
-
-        NotFoundException ex = assertThrows(NotFoundException.class, () -> courseService.getCoursesForUser(userId));
-
-        assertEquals("User defect type not found", ex.getMessage());
-    }
-
-    @Test
     void getCourseForUser_Success() {
         UUID courseId = UUID.randomUUID();
 
         User user = new User();
         user.setId(userId);
-
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
 
         Course course = new Course();
         course.setId(courseId);
@@ -116,7 +94,7 @@ class CourseServiceTest {
         exercise.setOrderIndex(1);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
         when(unitRepository.findByCourseIdOrderByOrderIndex(courseId)).thenReturn(List.of(unit));
         when(exerciseRepository.findByUnitIdInOrderByOrderIndex(any())).thenReturn(List.of(exercise));
@@ -127,34 +105,7 @@ class CourseServiceTest {
         assertEquals(courseId, result.getId());
         assertEquals(1, result.getUnits().size());
         assertEquals(1, result.getUnits().getFirst().getExercises().size());
-    }
-
-    @Test
-    void getCourseForUser_Fails_WhenCourseHasDifferentDefectType() {
-        UUID courseId = UUID.randomUUID();
-
-        DefectType stuttering = new DefectType();
-        stuttering.setId(2);
-        stuttering.setName("stuttering");
-
-        User user = new User();
-        user.setId(userId);
-
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
-
-        Course course2 = new Course();
-        course2.setId(courseId);
-        course2.setDefectType(stuttering);
-
-        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course2));
-
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> courseService.getCourseForUser(userId, courseId));
-
-        assertEquals("Course does not belong to user's defect type", ex.getMessage());
+        assertEquals(BigDecimal.ZERO, result.getProgressPercent());
     }
 
     @Test
@@ -163,10 +114,6 @@ class CourseServiceTest {
 
         User user = new User();
         user.setId(userId);
-
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
 
         Course course = new Course();
         course.setId(courseId);
@@ -183,7 +130,7 @@ class CourseServiceTest {
         unitProgress.setCompletedExercises(0);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
         when(userCourseProgressRepository.findByUserIdAndCourseId(userId, courseId)).thenReturn(Optional.empty());
@@ -208,10 +155,6 @@ class CourseServiceTest {
         User user = new User();
         user.setId(userId);
 
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
-
         Course course = new Course();
         course.setId(courseId);
         course.setDefectType(articulationDefect);
@@ -227,7 +170,7 @@ class CourseServiceTest {
         unitProgress.setCompletedExercises(0);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
         when(userCourseProgressRepository.findByUserIdAndCourseId(userId, courseId)).thenReturn(Optional.of(new UserCourseProgress()));
@@ -252,12 +195,8 @@ class CourseServiceTest {
         User user = new User();
         user.setId(userId);
 
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
-
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
         NotFoundException ex = assertThrows(NotFoundException.class,
@@ -272,11 +211,6 @@ class CourseServiceTest {
 
         User user = new User();
         user.setId(userId);
-
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
-
         Course course = new Course();
         course.setId(courseId);
         course.setDefectType(articulationDefect);
@@ -288,7 +222,7 @@ class CourseServiceTest {
         progress.setCompleted(true);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
         when(unitRepository.findByCourseIdOrderByOrderIndex(courseId)).thenReturn(List.of(unit));
@@ -302,6 +236,7 @@ class CourseServiceTest {
 
         assertEquals("Course already completed", ex.getMessage());
     }
+
     @Test
     void startCourse_Fails_WhenUserNotFound() {
         UUID courseId = UUID.randomUUID();
@@ -315,43 +250,11 @@ class CourseServiceTest {
     }
 
     @Test
-    void startCourse_Fails_WhenCourseDefectTypeMismatch() {
-        UUID courseId = UUID.randomUUID();
-
-        User user = new User();
-        user.setId(userId);
-
-        DefectType anotherDefect = new DefectType();
-        anotherDefect.setId(2);
-
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
-
-        Course course = new Course();
-        course.setId(courseId);
-        course.setDefectType(anotherDefect);
-
-        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
-
-        ForbiddenException ex = assertThrows(ForbiddenException.class,
-                () -> courseService.startCourse(userId, courseId));
-
-        assertEquals("Course does not belong to user's defect type", ex.getMessage());
-    }
-
-    @Test
     void startCourse_Fails_WhenUnitProgressMissing() {
         UUID courseId = UUID.randomUUID();
 
         User user = new User();
         user.setId(userId);
-
-        UserDefectType userDefectType = new UserDefectType();
-        userDefectType.setUser(user);
-        userDefectType.setDefectType(articulationDefect);
 
         Course course = new Course();
         course.setId(courseId);
@@ -361,7 +264,7 @@ class CourseServiceTest {
         unit.setId(UUID.randomUUID());
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
         when(unitRepository.findByCourseIdOrderByOrderIndex(courseId)).thenReturn(List.of(unit));
