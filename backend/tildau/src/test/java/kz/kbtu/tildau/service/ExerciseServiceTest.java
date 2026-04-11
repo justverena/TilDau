@@ -31,6 +31,7 @@ import static org.mockito.Mockito.*;
 class ExerciseServiceTest {
 
     @Mock private UserJpaRepository userJpaRepository;
+    @Mock private UserDefectTypeRepository userDefectTypeRepository;
     @Mock private ExerciseRepository exerciseRepository;
     @Mock private MinioService minioService;
     @Mock private UserExerciseRepository userExerciseRepository;
@@ -38,7 +39,6 @@ class ExerciseServiceTest {
     @Mock private AiService aiService;
     @Mock private ProgressService progressService;
     @Mock private NextStepService nextStepService;
-    @Mock private UserDefectTypeService userDefectTypeService;
 
     @InjectMocks private ExerciseService exerciseService;
 
@@ -54,6 +54,15 @@ class ExerciseServiceTest {
         articulationDefect = new DefectType();
         articulationDefect.setId(1);
         articulationDefect.setName("articulation");
+    }
+
+    private UserDefectType createUserDefectType(User user, DefectType defectType) {
+        UserDefectTypeId embeddedId = UserDefectTypeId.builder().userId(user.getId()).build();
+        return UserDefectType.builder()
+                .id(embeddedId)
+                .user(user)
+                .defectType(defectType)
+                .build();
     }
 
     private Exercise createExercise(UUID exerciseId, ExerciseType type, String expectedText, Course course) {
@@ -77,11 +86,13 @@ class ExerciseServiceTest {
     void getExercise_ReadAloud_Success() {
         User user = new User();
         user.setId(userId);
+
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
         Course course = createCourse(articulationDefect);
         Exercise exercise = createExercise(exerciseId, ExerciseType.READ_ALOUD, "Some text", course);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.of(exercise));
 
         ExerciseFullResponse result = exerciseService.getExercise(userId, exerciseId);
@@ -96,12 +107,13 @@ class ExerciseServiceTest {
     void getExercise_RepeatAfterAudio_Success() {
         User user = new User();
         user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
         Course course = createCourse(articulationDefect);
         Exercise exercise = createExercise(exerciseId, ExerciseType.REPEAT_AFTER_AUDIO, "Hidden text", course);
         exercise.setReferenceAudioUrl("exercise/audio.wav");
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.of(exercise));
         when(minioService.getPresignedUrl("exercise/audio.wav")).thenReturn("https://presigned-url");
 
@@ -121,8 +133,33 @@ class ExerciseServiceTest {
     }
 
     @Test
+    void getExercise_UserHasNoDefectType_Throws() {
+        User user = new User();
+        user.setId(userId);
+        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.empty());
+
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> exerciseService.getExercise(userId, exerciseId));
+        assertEquals("User defect type not found", ex.getMessage());
+    }
+
+    @Test
+    void getExercise_ExerciseWrongDefectType_Throws() {
+        User user = new User(); user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
+
+        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
+        when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.empty());
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> exerciseService.getExercise(userId, exerciseId));
+        assertEquals("Exercise does not belong to user's defect type", ex.getMessage());
+    }
+
+    @Test
     void submitExercise_Success() {
         User user = new User(); user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
         Course course = createCourse(articulationDefect);
         Exercise exercise = createExercise(exerciseId, ExerciseType.READ_ALOUD, "Expected text", course);
         AnalyzeResponse aiResponse = new AnalyzeResponse();
@@ -131,7 +168,7 @@ class ExerciseServiceTest {
         MultipartFile file = mock(MultipartFile.class);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.of(exercise));
         when(userExerciseRepository.countByUserIdAndExerciseId(userId, exerciseId)).thenReturn(0);
         when(userExerciseRepository.save(any(UserExercise.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -150,18 +187,20 @@ class ExerciseServiceTest {
     void submitExercise_ExerciseNotFound_Throws() {
         MultipartFile file = mock(MultipartFile.class);
         User user = new User(); user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.empty());
 
-        NotFoundException ex = assertThrows(NotFoundException.class, () -> exerciseService.submitExercise(userId, exerciseId, file));
-        assertEquals("Exercise not found", ex.getMessage());
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> exerciseService.submitExercise(userId, exerciseId, file));
+        assertEquals("Exercise does not belong to user's defect type", ex.getMessage());
     }
 
     @Test
     void submitExercise_Fail_ReturnsRetry() {
         User user = new User(); user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
         Course course = createCourse(articulationDefect);
         Exercise exercise = createExercise(exerciseId, ExerciseType.READ_ALOUD, "Expected text", course);
         AnalyzeResponse aiResponse = new AnalyzeResponse();
@@ -170,7 +209,7 @@ class ExerciseServiceTest {
         MultipartFile file = mock(MultipartFile.class);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(any(), anyInt())).thenReturn(Optional.of(exercise));
         when(aiService.analyze(any(), any())).thenReturn(aiResponse);
         when(userExerciseRepository.save(any())).thenAnswer(i -> i.getArgument(0));
@@ -184,8 +223,9 @@ class ExerciseServiceTest {
     }
 
     @Test
-    void submitExercise_AttemptNumber_IncrementsCorrectly() {
+    void submitExercise_AttemptNumber_IncrementsCorrectly() throws Exception {
         User user = new User(); user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
         Course course = createCourse(articulationDefect);
         Exercise exercise = createExercise(exerciseId, ExerciseType.READ_ALOUD, "Expected text", course);
         MultipartFile file = mock(MultipartFile.class);
@@ -195,7 +235,7 @@ class ExerciseServiceTest {
 
         when(userExerciseRepository.save(any(UserExercise.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.of(exercise));
         when(userExerciseRepository.countByUserIdAndExerciseId(userId, exerciseId)).thenReturn(3);
         doNothing().when(minioService).putObject(any(), any());
@@ -212,12 +252,13 @@ class ExerciseServiceTest {
     @Test
     void submitExercise_Fails_WhenAIIsNull() {
         User user = new User(); user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
         Course course = createCourse(articulationDefect);
         Exercise exercise = createExercise(exerciseId, ExerciseType.READ_ALOUD, "Expected text", course);
         MultipartFile file = mock(MultipartFile.class);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(any(), anyInt())).thenReturn(Optional.of(exercise));
         when(aiService.analyze(any(), any())).thenReturn(null);
 
@@ -228,12 +269,13 @@ class ExerciseServiceTest {
     @Test
     void submitExercise_FailsAndMarksAttemptFailed_OnException() {
         User user = new User(); user.setId(userId);
+        UserDefectType userDefectType = createUserDefectType(user, articulationDefect);
         Course course = createCourse(articulationDefect);
         Exercise exercise = createExercise(exerciseId, ExerciseType.READ_ALOUD, "Expected text", course);
         MultipartFile file = mock(MultipartFile.class);
 
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(userDefectTypeRepository.findByUserId(userId)).thenReturn(Optional.of(userDefectType));
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(any(), anyInt())).thenReturn(Optional.of(exercise));
         when(aiService.analyze(any(), any())).thenThrow(new RuntimeException("AI failed"));
 

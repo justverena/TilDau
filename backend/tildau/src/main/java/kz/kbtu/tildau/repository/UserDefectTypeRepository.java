@@ -8,6 +8,4 @@ import java.util.UUID;
 
 public interface UserDefectTypeRepository extends JpaRepository<UserDefectType, UUID> {
     Optional<UserDefectType> findByUserId(UUID userId);
-    void deleteByUserId(UUID userId);
-    boolean existsByUserId(UUID userId);
 }

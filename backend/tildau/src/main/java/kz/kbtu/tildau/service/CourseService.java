@@ -25,30 +25,30 @@ import java.util.stream.Collectors;
 public class CourseService {
 
     private final UserJpaRepository userJpaRepository;
+    private final UserDefectTypeRepository userDefectTypeRepository;
     private final CourseRepository courseRepository;
     private final UnitRepository unitRepository;
     private final ExerciseRepository exerciseRepository;
     private final UserCourseProgressRepository userCourseProgressRepository;
     private final UserUnitProgressRepository userUnitProgressRepository;
     private final NextStepService nextStepService;
-    private final UserDefectTypeService userDefectTypeService;
 
     public List<CourseShortResponse> getCoursesForUser(UUID userId) {
-        DefectType defect = getUserDefect(userId);
+        UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
 
-        return courseRepository.findByDefectTypeId(defect.getId())
+        return courseRepository.findByDefectTypeId(userDefectType.getDefectType().getId())
                 .stream()
                 .map(course -> new CourseShortResponse(
                         course.getId(),
                         course.getTitle()
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public CourseFullResponse getCourseForUser(UUID userId, UUID courseId) {
 
-        DefectType defect = getUserDefect(userId);
-        Course course =  getCourseOrThrow(courseId, defect);
+        UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
+        Course course =  getCourseOrThrow(courseId, userDefectType);
         UserCourseProgress progress = userCourseProgressRepository.findByUserIdAndCourseId(userId, courseId)
                 .orElse(null);
 
@@ -67,13 +67,11 @@ public class CourseService {
         );
     }
 
-
-
-    @Transactional
+   @Transactional
     public NextStepResponse startCourse(UUID userId, UUID courseId) {
         User user = getUserOrThrow(userId);
-        DefectType defect= getUserDefect(userId);
-        Course course =  getCourseOrThrow(courseId, defect);
+        UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
+        Course course =  getCourseOrThrow(courseId, userDefectType);
 
         List<Unit> units = getUnits(courseId);
         Optional<UserCourseProgress> progress = userCourseProgressRepository.findByUserIdAndCourseId(userId, courseId);
@@ -182,19 +180,20 @@ public class CourseService {
         return unitRepository.findByCourseIdOrderByOrderIndex(courseId);
     }
 
-    private Course getCourseOrThrow(UUID courseId, DefectType defect) {
+    private Course getCourseOrThrow(UUID courseId, UserDefectType userDefectType) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NotFoundException("Course not found"));
 
         if (!course.getDefectType().getId()
-                .equals(defect.getId())) {
+                .equals(userDefectType.getDefectType().getId())) {
             throw new ForbiddenException("Course does not belong to user's defect type");
         }
         return course;
     }
 
-    private DefectType getUserDefect(UUID userId) {
-        return userDefectTypeService.getUserDefectOrThrow(userId);
+    private UserDefectType getUserDefectTypeOrThrow(UUID userId) {
+        return userDefectTypeRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("User defect type not found"));
     }
 
     private User getUserOrThrow(UUID userId) {

@@ -27,17 +27,17 @@ public class ExerciseService {
     private final AiAnalysisResultRepository aiAnalysisResultRepository;
     private final ExerciseRepository exerciseRepository;
     private final MinioService minioService;
+    private final UserDefectTypeRepository userDefectTypeRepository;
     private final AiService aiService;
     private final ProgressService progressService;
     private final NextStepService nextStepService;
-    private final UserDefectTypeService userDefectTypeService;
 
     private static final int PASS_THRESHOLD = 85;
 
     public ExerciseFullResponse getExercise(UUID userId, UUID exerciseId) {
         User user = getUserOrThrow(userId);
-        DefectType defect = getUserDefect(userId);
-        Exercise exercise =  getExerciseOrThrow(exerciseId, defect.getId());
+        UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
+        Exercise exercise =  getExerciseOrThrow(exerciseId, userDefectType.getDefectType().getId());
         progressService.validateExerciseAccess(user, exercise);
 
         ExerciseFullResponse response = ExerciseFullResponse.builder()
@@ -65,8 +65,8 @@ public class ExerciseService {
     @Transactional
     public SubmitExerciseResponse submitExercise(UUID userId, UUID exerciseId, MultipartFile multipartFile) {
         User user = getUserOrThrow(userId);
-        DefectType defect = getUserDefect(userId);
-        Exercise exercise = getExerciseOrThrow(exerciseId, defect.getId());
+        UserDefectType userDefectType = getUserDefectTypeOrThrow(userId);
+        Exercise exercise = getExerciseOrThrow(exerciseId, userDefectType.getDefectType().getId());
         progressService.validateExerciseAccess(user, exercise);
 
         byte[] audioBytes = extractAudioBytes(multipartFile);
@@ -179,17 +179,18 @@ public class ExerciseService {
         }
     }
 
-    private Exercise getExerciseOrThrow(UUID exerciseId, Integer defectTypeId) {
+    private Exercise getExerciseOrThrow(UUID exerciseId, Integer userDefectTypeId) {
         return exerciseRepository
-                .findByIdAndUnit_Course_DefectType_Id(exerciseId, defectTypeId)
-                .orElseThrow(() -> new NotFoundException("Exercise not found"));
+                .findByIdAndUnit_Course_DefectType_Id(exerciseId, userDefectTypeId)
+                .orElseThrow(() -> new ForbiddenException("Exercise does not belong to user's defect type"));
     }
 
     private User getUserOrThrow(UUID userId) {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
-    private DefectType getUserDefect(UUID userId) {
-        return userDefectTypeService.getUserDefectOrThrow(userId);
+    private UserDefectType getUserDefectTypeOrThrow(UUID userId) {
+        return userDefectTypeRepository.findByUserId(userId).orElseThrow(() -> new NotFoundException("User defect type not found"));
     }
+
 }
