@@ -7,95 +7,86 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="All Courses"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
+    <LinearLayout
+        android:id="@+id/header"
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:background="#cfc6e8"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageButton
-        android:id="@+id/btnSearch"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/ic_search"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/titleText"
-        app:tint="@color/black" />
+        <TextView
+            android:id="@+id/titleHeader"
+            android:text="Lesson"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/filtersLayout"
+        android:id="@+id/searchBar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="24dp"
-    app:layout_constraintTop_toBottomOf="@id/titleText"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:weightSum="3"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/lightest_purple"
 
-    <Button
-        android:id="@+id/btnAll"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-    android:text="All"
-    android:textSize="14sp"
-    android:layout_weight="1"
-    android:backgroundTint="@color/main_purple"
-    android:textColor="@color/white"
-    android:textStyle="bold"/>
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
 
-    <Button
-        android:id="@+id/btnStuttering"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-        android:text="Stuttering"
-        android:textSize="14sp"
-        android:layout_weight="1"
-        android:backgroundTint="@color/light_gray"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:layout_marginStart="8dp"/>
+        <!-- 🔍 Иконка поиска -->
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_search" />
 
-    <Button
-        android:id="@+id/btnArticulation"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-        android:text="Articulation"
-        android:textSize="14sp"
-        android:layout_weight="1"
-        android:backgroundTint="@color/light_gray"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:layout_marginStart="8dp"/>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
+        <!-- ✏️ Поле ввода -->
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_gravity="center"/>
-</LinearLayout>
+            android:layout_weight="1"
+            android:hint="Search Courses"
+            android:textSize="14sp"
+            android:background="@android:color/transparent"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:textColor="@color/black"
+            android:textColorHint="#2F2F2F"/>
+
+        <!-- ⚙️ Иконка фильтра -->
+        <ImageView
+            android:id="@+id/btnFilter"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_filter"
+            app:tint="@color/main_purple" />
+
+    </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCourses"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:clipToPadding="false"
         android:paddingBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/filtersLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchBar"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

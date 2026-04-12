@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -24,100 +23,159 @@ class AudioPlayerView @JvmOverloads constructor(
     private val tvDuration: TextView
 
     private var mediaPlayer: MediaPlayer? = null
-    private var audioPath: String? = null
-    private val handler = Handler(Looper.getMainLooper())
 
-    private var isAudioPlaying = false
+    private val handler = Handler(Looper.getMainLooper())
+    private var updateRunnable: Runnable? = null
+
+    private var isPrepared = false
+    private var isPlaying = false
+
+    private var onCompletion: (() -> Unit)? = null
+
+    fun setOnCompletionListener(listener: () -> Unit) {
+        onCompletion = listener
+    }
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_audio_player, this, true)
+        LayoutInflater.from(context)
+            .inflate(R.layout.view_audio_player, this, true)
 
         btnPlay = findViewById(R.id.btnPlay)
         progressBar = findViewById(R.id.progressBar)
         tvCurrentTime = findViewById(R.id.tvCurrentTime)
         tvDuration = findViewById(R.id.tvDuration)
 
-        btnPlay.setOnClickListener {
-            togglePlayback()
-        }
+        btnPlay.setOnClickListener { toggle() }
     }
 
-    fun setAudio(path: String) {
+    // =========================
+    // SET AUDIO (SAFE VERSION)
+    // =========================
+    fun setAudio(path: String, autoPlay: Boolean = false) {
+
         release()
 
-        audioPath = path
-
         mediaPlayer = MediaPlayer().apply {
+
             setDataSource(path)
             prepareAsync()
 
             setOnPreparedListener { mp ->
+                isPrepared = true
+
                 progressBar.max = mp.duration
                 tvDuration.text = formatTime(mp.duration)
+
+                progressBar.progress = 0
+                tvCurrentTime.text = formatTime(0)
+
+                btnPlay.setImageResource(R.drawable.btn_play)
+
+                // 🔥 автозапуск после подготовки
+                if (autoPlay) {
+                    playInternal()
+                }
             }
 
             setOnCompletionListener {
-                isAudioPlaying = false
+                this@AudioPlayerView.isPlaying = false
+                isPrepared = false
+
                 btnPlay.setImageResource(R.drawable.btn_play)
-                handler.removeCallbacks(updateRunnable)
+
+                stopProgress()
 
                 progressBar.progress = progressBar.max
                 tvCurrentTime.text = formatTime(progressBar.max)
+
+                onCompletion?.invoke()
             }
         }
     }
 
-    fun play() {
+    // =========================
+    // TOGGLE
+    // =========================
+    private fun toggle() {
+        val player = mediaPlayer ?: return
+        if (!isPrepared) return
+
+        if (isPlaying) pauseInternal()
+        else playInternal()
+    }
+
+    private fun playInternal() {
         mediaPlayer?.start()
+        isPlaying = true
+
+        btnPlay.setImageResource(R.drawable.btn_pause)
+
+        startProgress()
+    }
+
+    private fun pauseInternal() {
+        mediaPlayer?.pause()
+        isPlaying = false
+
+        btnPlay.setImageResource(R.drawable.btn_play)
+
+        stopProgress()
+    }
+
+    // =========================
+    // PROGRESS
+    // =========================
+    private fun startProgress() {
+        updateRunnable = object : Runnable {
+            override fun run() {
+                val p = mediaPlayer ?: return
+
+                val pos = p.currentPosition
+                progressBar.progress = pos
+                tvCurrentTime.text = formatTime(pos)
+
+                handler.postDelayed(this, 250)
+            }
+        }
+        handler.post(updateRunnable!!)
+    }
+
+    private fun stopProgress() {
+        handler.removeCallbacks(updateRunnable ?: return)
+        updateRunnable = null
+    }
+
+    // =========================
+    // PUBLIC API
+    // =========================
+    fun play() {
+        if (isPrepared) playInternal()
     }
 
     fun pause() {
-        mediaPlayer?.pause()
-    }
-
-    fun stop() {
-        mediaPlayer?.stop()
-        release()
-    }
-
-    private fun togglePlayback() {
-        val player = mediaPlayer ?: return
-
-        if (isAudioPlaying) {
-            player.pause()
-            btnPlay.setImageResource(R.drawable.btn_play)
-        } else {
-            player.start()
-            btnPlay.setImageResource(R.drawable.btn_pause)
-            handler.post(updateRunnable)
-        }
-
-        isAudioPlaying = !isAudioPlaying
-    }
-
-    private val updateRunnable = object : Runnable {
-        override fun run() {
-            val player = mediaPlayer ?: return
-
-            val pos = player.currentPosition.coerceAtMost(progressBar.max)
-            progressBar.progress = pos
-            tvCurrentTime.text = formatTime(pos)
-
-            handler.postDelayed(this, 300)
-        }
-    }
-
-    private fun formatTime(ms: Int): String {
-        val totalSeconds = ms / 1000
-        val minutes = totalSeconds / 60
-        val seconds = totalSeconds % 60
-        return "%d:%02d".format(minutes, seconds)
+        pauseInternal()
     }
 
     fun release() {
+        stopProgress()
+
         mediaPlayer?.release()
         mediaPlayer = null
-        handler.removeCallbacks(updateRunnable)
-        isAudioPlaying = false
+
+        isPrepared = false
+        isPlaying = false
+
+        btnPlay.setImageResource(R.drawable.btn_play)
+
+        progressBar.progress = 0
+        tvCurrentTime.text = formatTime(0)
+    }
+
+    // =========================
+    // UTILS
+    // =========================
+    private fun formatTime(ms: Int): String {
+        val sec = ms / 1000
+        return "%d:%02d".format(sec / 60, sec % 60)
     }
 }

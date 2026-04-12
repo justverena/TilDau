@@ -5,17 +5,23 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import com.example.tildau.R
+import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.ui.base.BaseActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.tildau.data.remote.UserApi
+import com.example.tildau.data.repository.UserRepository
 
-class ProfileViewActivity : BaseActivity() {
+class ProfileViewActivity : AppCompatActivity() {
 
     private lateinit var tvName: TextView
     private lateinit var tvEmail: TextView
     private lateinit var tvPassword: TextView
+    private lateinit var viewModel: ProfileViewModel
 
     private val editFieldLauncher =
         registerForActivityResult(ProfileEditContract()) { result ->
-            // result: Pair<String, String> = field -> newValue
             result?.let { (field, value) ->
                 when (field) {
                     "name" -> tvName.text = value
@@ -27,13 +33,13 @@ class ProfileViewActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setBaseContent(R.layout.activity_profile_view)
+        setContentView(R.layout.activity_profile_view)
 
         tvName = findViewById(R.id.tvName)
         tvEmail = findViewById(R.id.tvEmail)
         tvPassword = findViewById(R.id.tvPassword)
 
-        // TODO: подтянуть реальные данные с бэка
+        initViewModel()
         loadUserData()
 
         makeFieldClickable(tvName, "name")
@@ -41,17 +47,24 @@ class ProfileViewActivity : BaseActivity() {
         makeFieldClickable(tvPassword, "password")
     }
 
-    private fun loadUserData() {
+    private fun initViewModel() {
         val prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE)
         val token = prefs.getString("jwt_token", null)
 
-        val api = com.example.tildau.data.remote.ApiClient.createServiceWithToken(
-            com.example.tildau.data.remote.UserApi::class.java
-        ) { token }
+        val api = ApiClient.createServiceWithToken(UserApi::class.java) { token }
+        val repository = UserRepository(api)
 
-        val repository = com.example.tildau.data.repository.UserRepository(api)
-        val viewModel = com.example.tildau.ui.profile.ProfileViewModel(repository)
+        viewModel = ViewModelProvider(
+            this,
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return ProfileViewModel(repository) as T
+                }
+            }
+        )[ProfileViewModel::class.java]
+    }
 
+    private fun loadUserData() {
         viewModel.loadProfile()
         viewModel.user.observe(this) { user ->
             tvName.text = user.name
@@ -61,9 +74,6 @@ class ProfileViewActivity : BaseActivity() {
     }
 
     private fun makeFieldClickable(textView: TextView, field: String) {
-        textView.isClickable = true
-        textView.isFocusable = true
-        ViewCompat.setBackground(textView, getDrawable(R.drawable.ripple_effect))
         textView.setOnClickListener {
             val intent = Intent(this, ProfileEditActivity::class.java)
             intent.putExtra("field", field)

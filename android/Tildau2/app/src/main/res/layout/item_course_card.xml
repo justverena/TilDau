@@ -5,7 +5,7 @@
     android:layout_height="180dp"
     android:layout_marginBottom="16dp"
 
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="10dp"
     app:cardElevation="4dp"
     app:cardBackgroundColor="#8e6d7a"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,11 +15,13 @@
     android:id="@+id/courseCardTitle"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="Amnestic aphasia"
+    android:text="Дислалия"
     android:textSize="12sp"
 
-    android:background="#ffffff"
+    android:background="@drawable/bg_card"
+    android:backgroundTint="@color/white"
     android:padding="6dp"
     android:layout_marginTop="12dp"
-    android:layout_marginStart="12dp"/>
+    android:layout_marginStart="12dp"
+    />
 </androidx.cardview.widget.CardView>

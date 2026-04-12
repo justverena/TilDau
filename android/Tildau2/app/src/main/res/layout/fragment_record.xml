@@ -30,13 +30,6 @@
                 android:gravity="center_vertical"
                 android:padding="16dp">
 
-                <ImageButton
-                    android:id="@+id/btnBack"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@android:color/transparent"
-                    android:src="@drawable/ic_arrow_left"
-                    app:tint="#1A1A2E" />
 
                 <TextView
                     android:id="@+id/exerciseTitle"
@@ -55,31 +48,6 @@
                 android:layout_height="3dp"
                 android:background="@color/light_gray"/>
 
-            <!-- PROGRESS -->
-            <LinearLayout
-                android:id="@+id/progressLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp">
-
-                <com.example.tildau.ui.record.ExerciseProgressView
-                    android:id="@+id/exerciseProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/exerciseProgressText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Exercise 1 of 3"
-                    android:textSize="13sp"
-                    android:textColor="#1A1A2E"
-                    android:layout_marginStart="12dp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
 
             <!-- INSTRUCTION -->
             <TextView
@@ -98,8 +66,10 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="64dp"
                 android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="64dp"
+
                 >
 
                 <LinearLayout
@@ -187,10 +157,7 @@
                     android:layout_marginStart="16dp"/>
             </LinearLayout>
 
-<!--            &lt;!&ndash; отступ чтобы не перекрывалось &ndash;&gt;-->
-<!--            <View-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="80dp"/>-->
+
 
         </LinearLayout>
     </ScrollView>
@@ -205,7 +172,9 @@
         android:layout_marginBottom="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        >
 
         <TextView
             android:id="@+id/recordHint"

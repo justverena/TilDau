@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.tildau.databinding.FragmentAccountBinding
+import com.example.tildau.ui.login.AuthActivity
 import com.example.tildau.ui.login.LoginActivity
 
 class AccountFragment : Fragment() {
@@ -31,12 +32,13 @@ class AccountFragment : Fragment() {
         binding.userNameText.text = userName
 
         binding.profileRow.setOnClickListener {
-            // сюда можно открывать ProfileFragment или Activity
+            val intent = Intent(requireContext(), ProfileViewActivity::class.java)
+            startActivity(intent)
         }
 
         binding.deleteButton.setOnClickListener {
             prefs.edit().clear().apply()
-            val intent = Intent(requireContext(), LoginActivity::class.java)
+            val intent = Intent(requireContext(), AuthActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }

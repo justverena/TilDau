@@ -120,22 +120,42 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun initCalendar() {
-        // Создаем 6x7 = 42 дня
+
         val days = mutableListOf<CalendarDay>()
 
-        // Пустые дни перед началом месяца
-        repeat(2) { days.add(CalendarDay()) } // для примера 2 пустых
-
-        // Основные дни месяца
-        for (i in 1..30) {
-            days.add(CalendarDay(number = i, isStreak = i % 3 == 0))
+        // пустые дни в начале (пример: неделя начинается со среды)
+        repeat(2) {
+            days.add(CalendarDay())
         }
 
-        // Добавляем пустые дни в конец до 42
-        while (days.size < 42) days.add(CalendarDay())
+        // 1 неделя (где есть streak)
+        for (i in 1..7) {
 
-        binding.calendarView.setMonthTitle("March, 2025")
-        binding.calendarView.setSubtitle("Just 2 more days to hit your weekly goal.")
+            val isStreak =
+                (i == 3) ||  // первая среда (например)
+                        (i == 5) ||  // "2-й день после среды"
+                        (i == 6)     // суббота
+
+            days.add(CalendarDay(
+                number = i,
+                isStreak = isStreak
+            ))
+        }
+
+        // 2 неделя и дальше — БЕЗ streak
+        for (i in 8..30) {
+            days.add(CalendarDay(
+                number = i,
+                isStreak = false
+            ))
+        }
+
+        // добивка до 42
+        while (days.size < 42) {
+            days.add(CalendarDay())
+        }
+
+        binding.calendarView.setMonthTitle("April, 2026")
         binding.calendarView.setDays(days)
     }
 

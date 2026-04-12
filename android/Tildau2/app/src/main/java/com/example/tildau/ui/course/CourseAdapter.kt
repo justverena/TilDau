@@ -227,7 +227,7 @@ class CourseAdapter(
         private val title: TextView = itemView.findViewById(R.id.courseCardTitle)
 
         fun bind() {
-            title.text = "Amnestic aphasia"
+            title.text = "Дислалия"
         }
     }
 

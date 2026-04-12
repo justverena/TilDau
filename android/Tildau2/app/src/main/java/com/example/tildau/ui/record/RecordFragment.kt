@@ -28,13 +28,26 @@ class RecordFragment : Fragment() {
     private lateinit var recorder: WavAudioRecorder
     private lateinit var audioPlayer: AudioPlayerView
 
-    private enum class RecordingState { IDLE, RECORDING, FINISHED }
+    private enum class RecordingState {
+        IDLE,
+        RECORDING,
+        FINISHED,
+        PLAYING
+    }
+
     private var currentState = RecordingState.IDLE
 
+    // =========================
+    // PERMISSION
+    // =========================
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startRecording()
-            else Toast.makeText(requireContext(), "Microphone permission required", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(
+                requireContext(),
+                "Microphone permission required",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
     companion object {
@@ -43,7 +56,9 @@ class RecordFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         exerciseId = arguments?.getString(ARG_EXERCISE_ID) ?: ""
+
         if (exerciseId.isEmpty()) {
             Toast.makeText(requireContext(), "Exercise ID missing", Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -65,77 +80,79 @@ class RecordFragment : Fragment() {
         recorder = WavAudioRecorder(requireContext())
         audioPlayer = binding.audioPlayer
 
+        // ✅ completion callback ОДИН РАЗ
+        audioPlayer.setOnCompletionListener {
+            updateUI(RecordingState.FINISHED)
+        }
+
         updateUI(RecordingState.IDLE)
         fetchFullExercise()
         setupRecording()
     }
 
+    // =========================
+    // UI STATE
+    // =========================
     private fun updateUI(state: RecordingState) {
         currentState = state
 
         when (state) {
+
             RecordingState.IDLE -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_record)
                 binding.btnSecondaryLeft.visibility = View.GONE
                 binding.btnSecondaryRight.visibility = View.GONE
                 binding.recordHint.text = "Tap to start recording"
             }
+
             RecordingState.RECORDING -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_pause)
                 binding.btnSecondaryLeft.visibility = View.GONE
                 binding.btnSecondaryRight.visibility = View.GONE
                 binding.recordHint.text = "Recording..."
             }
+
             RecordingState.FINISHED -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_play2)
                 binding.btnSecondaryLeft.visibility = View.VISIBLE
                 binding.btnSecondaryRight.visibility = View.VISIBLE
-                binding.btnSecondaryLeft.setImageResource(R.drawable.btn_replay)
-                binding.btnSecondaryRight.setImageResource(R.drawable.btn_next)
-                binding.recordHint.text = "Listen or continue"
+                binding.recordHint.text = "Tap to play recording"
+            }
+
+            RecordingState.PLAYING -> {
+                binding.btnRecord.setImageResource(R.drawable.btn_pause)
+                binding.btnSecondaryLeft.visibility = View.VISIBLE
+                binding.btnSecondaryRight.visibility = View.VISIBLE
+                binding.recordHint.text = "Playing..."
             }
         }
     }
 
-    private fun fetchFullExercise() {
-        val api = ApiClient.createServiceWithToken(ExerciseApi::class.java) {
-            TokenManager.getToken(requireContext())
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val exercise = api.getExercise(exerciseId)
-                fullExercise = exercise
-
-                bindExerciseUI(exercise)
-
-                setupExerciseProgress()
-            } catch (e: Exception) {
-                Log.e("RecordFragment", "Failed to load exercise", e)
-                Toast.makeText(requireContext(), "Failed to load exercise", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun setupExerciseProgress() {
-        val currentExercise = arguments?.getInt("currentExerciseNumber") ?: 1
-        val totalExercises = arguments?.getInt("totalExercises") ?: 3
-
-        binding.exerciseProgress.setProgressTextView(binding.exerciseProgressText)
-        binding.exerciseProgress.setup(totalExercises)
-        binding.exerciseProgress.update(currentExercise - 1)
-    }
-
+    // =========================
+    // SETUP RECORDING
+    // =========================
     private fun setupRecording() {
 
         binding.btnRecord.setOnClickListener {
             when (currentState) {
-                RecordingState.IDLE -> permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+
+                RecordingState.IDLE -> {
+                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+
                 RecordingState.RECORDING -> {
                     stopRecording()
                     updateUI(RecordingState.FINISHED)
                 }
-                RecordingState.FINISHED -> playRecordedAudio()
+
+                RecordingState.FINISHED -> {
+                    playRecordedAudio()
+                }
+
+                RecordingState.PLAYING -> {
+                    stopPlayback()
+                    updateUI(RecordingState.FINISHED)
+                }
             }
         }
 
@@ -155,6 +172,9 @@ class RecordFragment : Fragment() {
         }
     }
 
+    // =========================
+    // RECORDING
+    // =========================
     private fun startRecording() {
         recorder.startRecording()
         updateUI(RecordingState.RECORDING)
@@ -169,16 +189,25 @@ class RecordFragment : Fragment() {
         binding.waveformView.clear()
     }
 
+    // =========================
+    // PLAYBACK (FIXED)
+    // =========================
     private fun playRecordedAudio() {
         val path = recorder.outputFilePath ?: return
 
-        binding.audioContainer.visibility = View.VISIBLE
+        updateUI(RecordingState.PLAYING)
 
-        audioPlayer.release()
-        audioPlayer.setAudio(path)
-        audioPlayer.play()
+        // 🔥 автозапуск сразу после prepare
+        audioPlayer.setAudio(path, autoPlay = true)
     }
 
+    private fun stopPlayback() {
+        audioPlayer.pause()
+    }
+
+    // =========================
+    // NAVIGATION
+    // =========================
     private fun stopRecordingAndNavigate() {
         val audioPath = recorder.outputFilePath ?: return
 
@@ -189,7 +218,37 @@ class RecordFragment : Fragment() {
             putString("subtitle", fullExercise?.instruction)
         }
 
-        findNavController().navigate(R.id.action_recordFragment_to_analyzeFragment, bundle)
+        findNavController().navigate(
+            R.id.action_recordFragment_to_analyzeFragment,
+            bundle
+        )
+    }
+
+    // =========================
+    // API
+    // =========================
+    private fun fetchFullExercise() {
+
+        val api = ApiClient.createServiceWithToken(ExerciseApi::class.java) {
+            TokenManager.getToken(requireContext())
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val exercise = api.getExercise(exerciseId)
+                fullExercise = exercise
+
+                bindExerciseUI(exercise)
+
+            } catch (e: Exception) {
+                Log.e("RecordFragment", "Failed to load exercise", e)
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to load exercise",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private fun bindExerciseUI(exercise: ExerciseFullResponse) {
@@ -198,10 +257,8 @@ class RecordFragment : Fragment() {
         binding.exerciseInstructionText.text = exercise.instruction
 
         binding.expectedText.text =
-            if (!exercise.expectedText.isNullOrEmpty())
-                exercise.expectedText
-            else
-                "Listen to the audio"
+            exercise.expectedText?.takeIf { it.isNotEmpty() }
+                ?: "Listen to the audio"
 
         val hasAudio = !exercise.referenceAudioUrl.isNullOrEmpty()
 
@@ -213,10 +270,15 @@ class RecordFragment : Fragment() {
         }
     }
 
+    // =========================
+    // CLEANUP
+    // =========================
     override fun onDestroyView() {
         super.onDestroyView()
+
         recorder.stopRecording()
         audioPlayer.release()
+
         _binding = null
     }
 }

@@ -85,10 +85,6 @@ class CoursesFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.loading.observe(viewLifecycleOwner) {
-            binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
-        }
-
         viewModel.courses.observe(viewLifecycleOwner) {
             courseAdapter.updateCourses(it)
         }
