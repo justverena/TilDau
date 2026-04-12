@@ -4,5 +4,6 @@ data class CourseFullResponse(
     val id: String,
     val title: String,
     val description: String,
-    val units: List<UnitResponse>
+    val units: List<UnitResponse>,
+    val progressPercent: Double
 )

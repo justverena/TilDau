@@ -11,6 +11,8 @@ import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
 import com.example.tildau.databinding.ActivityRegisterPasswordBinding
 import com.example.tildau.ui.login.AuthActivity
+import com.example.tildau.ui.main.MainActivity
+import com.example.tildau.ui.onboarding.DefectOnboardingActivity
 
 class RegisterPasswordActivity : AppCompatActivity() {
 
@@ -32,15 +34,25 @@ class RegisterPasswordActivity : AppCompatActivity() {
         val email = intent.getStringExtra("email") ?: ""
         val name = intent.getStringExtra("name") ?: ""
 
-        viewModel.result.observe(this) { result ->
-            result.onSuccess { message ->
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, AuthActivity::class.java)
+        viewModel.navigateToMain.observe(this) {
+            if (it == true) {
+                val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()
             }
+        }
 
+        viewModel.navigateToDefect.observe(this) {
+            if (it == true) {
+                val intent = Intent(this, DefectOnboardingActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
+        }
+
+        viewModel.result.observe(this) { result ->
             result.onFailure { exception ->
                 Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
@@ -57,7 +69,7 @@ class RegisterPasswordActivity : AppCompatActivity() {
             viewModel.name = name
             viewModel.password = password
 
-            viewModel.register()
+            viewModel.register(this)
         }
     }
 }

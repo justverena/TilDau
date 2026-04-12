@@ -8,6 +8,7 @@ import kz.kbtu.tildau.repository.UserDefectTypeRepository;
 import kz.kbtu.tildau.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -19,7 +20,14 @@ public class UserDefectTypeService {
     private final DefectTypeRepository defectTypeRepository;
     private final UserDefectTypeRepository userDefectTypeRepository;
 
+<<<<<<< Updated upstream
     public void assignDefectType(UUID userId, Integer defectTypeId) {
+=======
+    @Transactional
+    public void setUserDefects(UUID userId, Integer defectTypeId) {
+        User user = getUserOrThrow(userId);
+        checkRole(user);
+>>>>>>> Stashed changes
 
         User user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

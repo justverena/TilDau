@@ -1,99 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/unitCard"
     android:layout_width="match_parent"
-    android:layout_height="82dp"
-    android:layout_marginBottom="16dp"
-    android:backgroundTint="#F9F9FB"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="#E7E7EB">
+    android:layout_height="wrap_content"
+    android:paddingBottom="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+    <!-- Верхняя линия -->
+    <View
+        android:id="@+id/lineTop"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="#CFCFCF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/unitNumber"
+        app:layout_constraintStart_toStartOf="@id/unitNumber"/>
 
-        <!-- Круг с номером -->
-        <FrameLayout
-            android:id="@+id/numberContainer"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/bg_circle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+    <!-- КРУГ -->
+    <TextView
+        android:id="@+id/unitNumber"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:text="1"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:background="@drawable/bg_circle_idle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-            <TextView
-                android:id="@+id/unitNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:textColor="#353546"/>
-        </FrameLayout>
+    <!-- Нижняя линия -->
+    <View
+        android:id="@+id/lineBottom"
+        android:layout_width="2dp"
+        android:layout_height="36dp"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@id/unitNumber"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/unitNumber"
+        app:layout_constraintEnd_toEndOf="@id/unitNumber"/>
 
-        <!-- Заголовок -->
-        <TextView
-            android:id="@+id/unitTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginStart="16dp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            app:layout_constraintStart_toEndOf="@id/numberContainer"
-            app:layout_constraintEnd_toStartOf="@id/stateIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/statusContainer"/>
+    <!-- TITLE -->
+    <TextView
+        android:id="@+id/unitTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Unit title"
+        android:textSize="16sp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@id/unitNumber"
+        app:layout_constraintTop_toTopOf="@id/unitNumber"
+        app:layout_constraintEnd_toStartOf="@id/stateIcon"/>
 
-        <!-- Статус -->
-        <LinearLayout
-            android:id="@+id/statusContainer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            app:layout_constraintStart_toEndOf="@id/numberContainer"
-            app:layout_constraintEnd_toStartOf="@id/stateIcon"
-            app:layout_constraintTop_toBottomOf="@id/unitTitle"
-            app:layout_constraintBottom_toBottomOf="parent">
+    <!-- ARROW -->
+    <ImageView
+        android:id="@+id/stateIcon"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/ic_chevron"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/unitTitle"
+        app:tint="@color/main_purple" />
 
-            <TextView
-                android:id="@+id/statusPrimary"
-                android:textSize="10sp"
-                android:textStyle="italic"
-                android:textColor="#666666"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/statusPrimary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Completed"
+        android:textColor="@color/gray"
+        android:textStyle="italic"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/unitTitle"
+        app:layout_constraintTop_toBottomOf="@id/unitTitle"/>
 
-            <TextView
-                android:id="@+id/statusSecondary"
-                android:textSize="10sp"
-                android:textStyle="italic"
-                android:textColor="#666666"
-                android:layout_marginStart="8dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <!-- Иконка справа -->
-        <ImageView
-            android:id="@+id/stateIcon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</com.google.android.material.card.MaterialCardView>
+    <TextView
+        android:id="@+id/statusSecondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last Score: 98%"
+        android:textColor="#666"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toEndOf="@id/statusPrimary"
+        app:layout_constraintEnd_toEndOf="@id/unitTitle"
+        app:layout_constraintTop_toTopOf="@id/statusPrimary"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

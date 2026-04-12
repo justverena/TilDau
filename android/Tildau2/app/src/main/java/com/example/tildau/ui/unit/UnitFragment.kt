@@ -57,7 +57,11 @@ class UnitFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = ExercisesAdapter(unit.exercises) { exercise ->
-            fetchFullExerciseAndOpenRecord(exercise.id.toString())
+            adapter = ExercisesAdapter(unit.exercises) { exercise ->
+                if (!exercise.isLocked) {
+                    fetchFullExerciseAndOpenRecord(exercise.id)
+                }
+            }
         }
 
         binding.recyclerViewExercises.layoutManager = LinearLayoutManager(requireContext())

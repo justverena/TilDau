@@ -8,12 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.tildau.R
+import com.example.tildau.data.local.TokenManager
 import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
 import com.example.tildau.databinding.ActivityLoginBinding
 import com.example.tildau.ui.home.HomeFragment
 import com.example.tildau.ui.main.MainActivity
+import com.example.tildau.ui.onboarding.DefectOnboardingActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -54,27 +56,43 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
-            viewModel.login(email, password)
+            viewModel.login(this, email, password)
         }
 
         // Обработка результата логина
-        viewModel.result.observe(this) { result ->
-            result.onSuccess { response ->
-                val prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE)
-                prefs.edit()
-                    .putString("jwt_token", response.token)
-                    .putString("user_name", response.username)
-                    .apply()
+//        viewModel.result.observe(this) { result ->
+//            result.onSuccess { response ->
+//                TokenManager.saveToken(this, response.token)
+//
+//                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+//
+//                // ✅ Запуск MainActivity после успешного логина
+//                val intent = Intent(this, MainActivity::class.java)
+//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                startActivity(intent)
+//                finish()
+//            }.onFailure {
+//                Toast.makeText(this, it.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
-                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-
-                // ✅ Запуск MainActivity после успешного логина
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+        viewModel.navigateToMain.observe(this) {
+            if (it == true) {
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
-            }.onFailure {
-                Toast.makeText(this, it.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.navigateToDefect.observe(this) {
+            if (it == true) {
+                startActivity(Intent(this, DefectOnboardingActivity::class.java))
+                finish()
+            }
+        }
+
+        viewModel.error.observe(this) {
+            it?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
         }
     }

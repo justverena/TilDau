@@ -1,0 +1,31 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- фон (пустая часть - белая) -->
+    <item>
+        <shape
+            android:shape="oval"
+            android:useLevel="false">
+            <stroke
+                android:width="6dp"
+                android:color="#FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- заполнение (черное) -->
+    <item>
+        <rotate
+            android:fromDegrees="270"
+            android:toDegrees="270">
+
+            <shape
+                android:shape="ring"
+                android:useLevel="true"
+                android:thickness="6dp">
+
+                <solid android:color="#000000"/>
+            </shape>
+
+        </rotate>
+    </item>
+
+</layer-list>

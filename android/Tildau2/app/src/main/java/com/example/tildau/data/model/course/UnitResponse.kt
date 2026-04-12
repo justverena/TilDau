@@ -7,5 +7,6 @@ data class UnitResponse(
     val id: String,
     val title: String,
     val description: String,
+    val isCompleted: Boolean,
     val exercises: List<ExerciseResponse>
 ) : Serializable

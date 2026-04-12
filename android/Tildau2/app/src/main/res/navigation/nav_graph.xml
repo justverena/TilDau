@@ -4,6 +4,10 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
+    <action
+        android:id="@+id/action_global_recordFragment"
+        app:destination="@id/recordFragment" />
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.tildau.ui.home.HomeFragment"
@@ -19,6 +23,10 @@
             app:destination="@id/resultFragment" />
 
         <action
+            android:id="@+id/action_analyzeFragment_to_recordFragment"
+            app:destination="@id/recordFragment" />
+
+        <action
             android:id="@+id/action_analyzeFragment_to_coursesFragment"
             app:destination="@id/coursesFragment" />
     </fragment>
@@ -26,7 +34,17 @@
     <fragment
         android:id="@+id/resultFragment"
         android:name="com.example.tildau.ui.result.ResultFragment"
-        android:label="Result" />
+        android:label="Result">
+
+        <action
+            android:id="@+id/action_resultFragment_to_recordFragment"
+            app:destination="@id/recordFragment"/>
+
+        <action
+            android:id="@+id/action_resultFragment_to_coursesFragment"
+            app:destination="@id/coursesFragment"/>
+    </fragment>
+
 
     <fragment
         android:id="@+id/coursesFragment"
@@ -40,6 +58,10 @@
         <action
             android:id="@+id/action_coursesFragment_to_unitFragment"
             app:destination="@id/unitFragment" />
+
+        <action
+            android:id="@+id/action_coursesFragment_to_recordFragment"
+            app:destination="@id/recordFragment" />
     </fragment>
 
     <fragment
@@ -76,5 +98,11 @@
         <action
             android:id="@+id/action_recordFragment_to_analyzeFragment"
             app:destination="@id/analyzeFragment" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.example.tildau.ui.statistics.StatisticsFragment"
+        android:label="Statistics" />
 </navigation>

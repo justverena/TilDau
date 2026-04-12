@@ -31,6 +31,8 @@ class RegisterNameActivity : AppCompatActivity() {
         val email = intent.getStringExtra("email") ?: ""
 
         binding.btnNext.setOnClickListener {
+
+
             val name = binding.etName.text.toString()
             if (name.isBlank()) {
                 Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show()

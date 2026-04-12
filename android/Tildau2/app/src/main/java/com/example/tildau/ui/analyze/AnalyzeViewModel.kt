@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tildau.data.local.TokenManager
+import com.example.tildau.data.model.next.NextStepResponse
 import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.ExerciseApi
 import kotlinx.coroutines.delay
@@ -21,10 +22,13 @@ class AnalyzeViewModel : ViewModel() {
     private val _state = MutableStateFlow<AnalyzeState>(AnalyzeState.Idle)
     val state: StateFlow<AnalyzeState> = _state
 
+    // AnalyzeViewModel.kt
+//    private val _nextStep = MutableStateFlow<NextStepResponse?>(null)
+//    val nextStep: StateFlow<NextStepResponse?> = _nextStep
+
     fun analyze(audioPath: String, exerciseId: String, context: Context) {
         viewModelScope.launch {
             _state.value = AnalyzeState.Loading
-
             try {
                 val file = File(audioPath)
                 if (!file.exists()) {
@@ -32,24 +36,18 @@ class AnalyzeViewModel : ViewModel() {
                     return@launch
                 }
 
-                val requestFile =
-                    file.asRequestBody("audio/wav".toMediaTypeOrNull())
+                val requestFile = file.asRequestBody("audio/wav".toMediaTypeOrNull())
+                val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-                val body =
-                    MultipartBody.Part.createFormData("file", file.name, requestFile)
-
-                val api = ApiClient.createServiceWithToken(
-                    ExerciseApi::class.java
-                ) {
+                val api = ApiClient.createServiceWithToken(ExerciseApi::class.java) {
                     TokenManager.getToken(context)
                 }
 
                 val response = api.submitExercise(exerciseId, body)
 
                 _state.value = AnalyzeState.Success(response)
-
+//                _nextStep.value = response.nextStep // вот сюда
             } catch (e: Exception) {
-                Log.e("AnalyzeViewModel", "Error submitting audio", e)
                 _state.value = AnalyzeState.Error(e.message ?: "Unknown error")
             }
         }

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F2F8">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- HEADER -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Statistic"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1C1C1E"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- STREAK -->
+        <TextView
+            android:id="@+id/tvStreak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Practiced 5 days in a row!"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#1C1C1E"/>
+
+        <TextView
+            android:id="@+id/tvStreakHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Just 2 more days to hit your weekly goal."
+            android:textSize="12sp"
+            android:textColor="#7A7A7A"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- 🔥 CALENDAR (ПОКА ЗАГЛУШКА) -->
+        <!-- 🔥 CALENDAR -->
+        <com.example.tildau.ui.calendar.CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"/>
+
+        <!-- SKILL TRENDS -->
+        <TextView
+            android:layout_marginTop="16dp"
+            android:text="Skill Trends"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#1C1C1E"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/skillContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:weightSum="3"
+            >
+
+            <!-- FLUENCY -->
+            <LinearLayout
+                android:id="@+id/cardFluency"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="15dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_card"
+                android:backgroundTint="@color/bg_purple"
+                android:padding="12dp">
+
+                <FrameLayout
+                    android:layout_width="70dp"
+                    android:layout_height="70dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressFluency"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:max="100"
+                        android:progress="87"
+                        android:rotation="-90"
+                        android:progressDrawable="@drawable/progress_circle"
+                        android:indeterminate="false"/>
+
+                    <TextView
+                        android:id="@+id/tvFluencyValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="87"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1C1C1E"/>
+
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fluency"
+                    android:layout_marginTop="4dp"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#1C1C1E"/>
+            </LinearLayout>
+
+            <!-- OVERALL (БОЛЬШЕ) -->
+            <LinearLayout
+                android:id="@+id/cardOverall"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="156dp"
+                android:layout_marginEnd="15dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_card"
+                android:backgroundTint="#E2D6FF"
+                android:padding="12dp">
+
+                <FrameLayout
+                    android:layout_width="70dp"
+                    android:layout_height="70dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressOverall"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:progressDrawable="@drawable/progress_circle"
+                        android:max="100"
+                        android:progress="75"/>
+
+                    <TextView
+                        android:id="@+id/tvOverallValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="75"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#1C1C1E"/>
+
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Overall"
+                    android:layout_marginTop="4dp"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#1C1C1E"/>
+            </LinearLayout>
+
+            <!-- PRONUNCIATION -->
+            <LinearLayout
+                android:id="@+id/cardPronunciation"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_card"
+                android:backgroundTint="@color/bg_purple"
+                android:padding="12dp">
+
+
+                <FrameLayout
+                    android:layout_width="70dp"
+                    android:layout_height="70dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressPronounciation"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:progressDrawable="@drawable/progress_circle"
+                        android:max="100"
+                        android:progress="80"/>
+
+                    <TextView
+                        android:id="@+id/tvPronunciationValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="75"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1C1C1E"/>
+
+                </FrameLayout>
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pronunciation"
+                    android:layout_marginTop="4dp"
+                    android:textStyle="bold"
+                    android:textSize="11sp"
+                    android:textColor="#1C1C1E"/>
+            </LinearLayout>
+
+        </LinearLayout>
+        <!-- ACHIEVEMENTS HEADER -->
+        <LinearLayout
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:text="Achievements"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#1C1C1E"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:id="@+id/tvViewAll"
+                android:text="View all →"
+                android:textColor="#6C4CF1"
+                android:textSize="12sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- 🔥 ACHIEVEMENTS RECYCLER -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvAchievements"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            />
+
+    </LinearLayout>
+</ScrollView>
