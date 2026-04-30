@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.tildau.R
 import com.example.tildau.databinding.ActivityAuthBinding
+import com.example.tildau.ui.main.MainActivity
 import com.example.tildau.ui.register.RegisterEmailActivity
 
 class AuthActivity : AppCompatActivity() {
@@ -27,6 +28,23 @@ class AuthActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+
+
+//    override fun onStart() {
+//        super.onStart()
+//
+//        val prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE)
+//        val token = prefs.getString("jwt_token", null)
+//
+//        if (!token.isNullOrEmpty()) {
+//            // Если уже залогинен — сразу в MainActivity
+//            val intent = Intent(this, MainActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            startActivity(intent)
+//            finish()
+//        }
+//    }
 
 
 }

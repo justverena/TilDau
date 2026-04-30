@@ -3,4 +3,8 @@
     <dimen name="tapbar_extra_top">2dp</dimen>
     <dimen name="tapbar_extra_bottom">12dp</dimen>
 
+    <dimen name="progress_circle_size">12dp</dimen>
+    <dimen name="progress_circle_margin">6dp</dimen>
+    <dimen name="progress_circle_stroke">2dp</dimen>
+
 </resources>

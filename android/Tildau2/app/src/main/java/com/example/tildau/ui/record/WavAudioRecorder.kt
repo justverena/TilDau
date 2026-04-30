@@ -10,6 +10,14 @@ import android.annotation.SuppressLint
 
 class WavAudioRecorder(private val context: Context) {
 
+    private enum class RecordingState {
+        IDLE,
+        RECORDING,
+        FINISHED
+    }
+
+    private var currentState = RecordingState.IDLE
+
     private val sampleRate = 44100
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT

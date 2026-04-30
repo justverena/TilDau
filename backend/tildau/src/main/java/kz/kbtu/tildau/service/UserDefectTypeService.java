@@ -11,6 +11,7 @@ import kz.kbtu.tildau.repository.UserDefectTypeRepository;
 import kz.kbtu.tildau.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class UserDefectTypeService {
     private final DefectTypeRepository defectTypeRepository;
     private final UserDefectTypeRepository userDefectTypeRepository;
 
+    @Transactional
     public void setUserDefects(UUID userId, Integer defectTypeId) {
         User user = getUserOrThrow(userId);
         checkRole(user);

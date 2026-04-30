@@ -15,7 +15,6 @@ class CoursesAdapter(
 
     inner class CourseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.courseTitle)
-        val description: TextView = view.findViewById(R.id.courseDescription)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
@@ -27,7 +26,6 @@ class CoursesAdapter(
     override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
         val course = courses[position]
         holder.title.text = course.title
-        holder.description.text = course.description
 
         holder.itemView.setOnClickListener {
             onCourseClick(course)

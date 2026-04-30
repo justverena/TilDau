@@ -9,8 +9,14 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.tildau.R
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.example.tildau.data.model.next.NextStepResponse
+import com.example.tildau.data.model.next.NextStepType
+import androidx.navigation.fragment.findNavController
+import com.example.tildau.navigation.NextStepHandler
 
 class ResultFragment : Fragment() {
+
+    private lateinit var nextStep: NextStepResponse
 
     private lateinit var circleProgress: CircularProgressIndicator
     private lateinit var scoreNumber: TextView
@@ -45,6 +51,7 @@ class ResultFragment : Fragment() {
         val score = arguments?.getInt("score") ?: 0
         val feedback = arguments?.getStringArrayList("feedback") ?: arrayListOf()
 
+        nextStep = arguments?.getSerializable("nextStep") as NextStepResponse
         // Настраиваем прогресс и текст
         circleProgress.progress = score
         scoreNumber.text = score.toString()
@@ -69,11 +76,18 @@ class ResultFragment : Fragment() {
 
         // Кнопки
         nextLessonBtn.setOnClickListener {
-            Toast.makeText(requireContext(), "Next Lesson clicked", Toast.LENGTH_SHORT).show()
+            NextStepHandler.handle(this, nextStep)
         }
 
+//        retryPracticeBtn.setOnClickListener {
+//            NextStepHandler.handle(
+//                this,
+//                nextStep.copy(type = NextStepType.RETRY)
+//            )
+//        }
+
         retryPracticeBtn.setOnClickListener {
-            Toast.makeText(requireContext(), "Retry Practice clicked", Toast.LENGTH_SHORT).show()
+            NextStepHandler.handle(this, nextStep)
         }
 
         backButton.setOnClickListener {

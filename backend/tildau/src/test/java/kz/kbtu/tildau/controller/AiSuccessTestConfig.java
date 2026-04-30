@@ -22,9 +22,9 @@ public class AiSuccessTestConfig {
                 if (expectedText == null) expectedText = "";
                 AnalyzeResponse response = new AnalyzeResponse();
                 response.setPronunciationScore(90);
-                response.setFluencyScore(85);
-                response.setEmbeddingScore(88);
-                response.setOverallScore(87);
+                response.setFluencyScore(90);
+                response.setEmbeddingScore(90);
+                response.setOverallScore(95);
                 response.setFeedback(List.of("Good pronunciation","Stable fluency"));
                 response.setFlags(List.of());
                 response.setMetrics(Map.of());

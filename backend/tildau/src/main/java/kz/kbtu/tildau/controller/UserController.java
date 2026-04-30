@@ -6,7 +6,6 @@ import kz.kbtu.tildau.dto.auth.RegisterRequest;
 import kz.kbtu.tildau.dto.auth.RegisterResponse;
 import kz.kbtu.tildau.dto.user.*;
 import kz.kbtu.tildau.entity.DefectType;
-import kz.kbtu.tildau.exception.UnauthorizedException;
 import kz.kbtu.tildau.repository.DefectTypeRepository;
 import kz.kbtu.tildau.security.CustomerUserDetails;
 import kz.kbtu.tildau.service.UserDefectTypeService;
@@ -42,9 +41,6 @@ public class UserController {
     }
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(@AuthenticationPrincipal CustomerUserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
         User user = userDetails.getUser();
         UserResponse response = new UserResponse(
                 user.getId(),

@@ -1,5 +1,6 @@
 package com.example.tildau.data.repository
 
+import com.example.tildau.data.model.defect.SetDefectRequest
 import com.example.tildau.data.model.login.LoginRequest
 import com.example.tildau.data.model.login.LoginResponse
 import com.example.tildau.data.model.register.RegisterRequest
@@ -22,6 +23,18 @@ class AuthRepository(
                 password = password
             )
         )
+    }
+
+    suspend fun getDefectTypes() =
+        api.getDefectTypes()
+
+    suspend fun setDefect(id: Int) {
+        android.util.Log.d("DEFECT_FLOW", "API CALL setDefect id=$id")
+        api.setDefect(SetDefectRequest(id))
+    }
+
+    suspend fun checkDefects(): Boolean {
+        return api.getDefectStatus().hasDefects
     }
 
     suspend fun login(email: String, password: String): LoginResponse {

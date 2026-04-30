@@ -4,7 +4,7 @@ import kz.kbtu.tildau.dto.ai.AnalyzeResponse;
 import kz.kbtu.tildau.dto.exercise.ExerciseFullResponse;
 import kz.kbtu.tildau.dto.exercise.SubmitExerciseResponse;
 import kz.kbtu.tildau.dto.nextStep.NextStepResponse;
-import kz.kbtu.tildau.embeddedId.UserDefectTypeId;
+import kz.kbtu.tildau.dto.stats.AchievementResponse;
 import kz.kbtu.tildau.entity.*;
 import kz.kbtu.tildau.enums.ExerciseStatus;
 import kz.kbtu.tildau.enums.ExerciseType;
@@ -39,6 +39,7 @@ class ExerciseServiceTest {
     @Mock private ProgressService progressService;
     @Mock private NextStepService nextStepService;
     @Mock private UserDefectTypeService userDefectTypeService;
+    @Mock private AchievementService achievementService;
 
     @InjectMocks private ExerciseService exerciseService;
 
@@ -137,6 +138,7 @@ class ExerciseServiceTest {
         when(userExerciseRepository.save(any(UserExercise.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(aiService.analyze(any(), any())).thenReturn(aiResponse);
         when(nextStepService.getNextStepAfterExercise(any(), any())).thenReturn(new NextStepResponse(NextStepType.EXERCISE, UUID.randomUUID()));
+        when(achievementService.checkAchievements(any())).thenReturn(List.of());
 
         SubmitExerciseResponse response = exerciseService.submitExercise(userId, exerciseId, file);
 
@@ -144,6 +146,7 @@ class ExerciseServiceTest {
         assertEquals(List.of("Work on pacing"), response.getFeedback());
         verify(userExerciseRepository, atLeastOnce()).save(argThat(ue -> ue.getStatus() == ExerciseStatus.COMPLETED));
         verify(progressService).handleSuccessfulAttempt(user, exercise);
+        verify(achievementService).checkAchievements(userId);
     }
 
     @Test
@@ -200,6 +203,7 @@ class ExerciseServiceTest {
         when(userExerciseRepository.countByUserIdAndExerciseId(userId, exerciseId)).thenReturn(3);
         doNothing().when(minioService).putObject(any(), any());
         when(aiService.analyze(any(), any())).thenReturn(aiResponse);
+        when(achievementService.checkAchievements(any())).thenReturn(List.of());
 
         SubmitExerciseResponse response = exerciseService.submitExercise(userId, exerciseId, file);
 
@@ -207,6 +211,37 @@ class ExerciseServiceTest {
         verify(userExerciseRepository, atLeastOnce()).save(captor.capture());
         assertEquals(4, captor.getValue().getAttemptNumber());
         verify(progressService).validateExerciseAccess(user, exercise);
+    }
+
+    @Test
+    void submitExercise_returnsNewAchievements() {
+        User user = new User(); user.setId(userId);
+        Course course = createCourse(articulationDefect);
+        Exercise exercise = createExercise(exerciseId, ExerciseType.READ_ALOUD, "Expected text", course);
+        AnalyzeResponse aiResponse = new AnalyzeResponse();
+        aiResponse.setOverallScore(95);
+        aiResponse.setFeedback(List.of("Good"));
+        MultipartFile file = mock(MultipartFile.class);
+
+        AchievementResponse achievement = AchievementResponse.builder()
+                .code("GOOD_SCORE_90")
+                .title("Test")
+                .description("Test desc")
+                .build();
+
+        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
+        when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.of(exercise));
+        when(userExerciseRepository.countByUserIdAndExerciseId(userId, exerciseId)).thenReturn(0);
+        when(userExerciseRepository.save(any(UserExercise.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(aiService.analyze(any(), any())).thenReturn(aiResponse);
+        when(nextStepService.getNextStepAfterExercise(any(), any())).thenReturn(new NextStepResponse(NextStepType.EXERCISE, UUID.randomUUID()));
+        when(achievementService.checkAchievements(userId)).thenReturn(List.of(achievement));
+
+        SubmitExerciseResponse response = exerciseService.submitExercise(userId, exerciseId, file);
+
+        assertFalse(response.getNewAchievements().isEmpty());
+        assertEquals("GOOD_SCORE_90", response.getNewAchievements().getFirst().getCode());
     }
 
     @Test

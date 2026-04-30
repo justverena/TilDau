@@ -100,7 +100,9 @@ public abstract class BaseIntegrationTest {
         insertUserDefectType();
         insertCourses();
         insertUnits();
+        seedAchievement();
     }
+
     private void generateIds() {
         userId = UUID.randomUUID();
         courseId = UUID.randomUUID();
@@ -290,6 +292,44 @@ public abstract class BaseIntegrationTest {
         WHERE user_id = ? AND unit_id = ?
     """, Integer.class, userId, unitId);
     }
+
+    protected void insertStreakAndActivity(UUID userId,UUID exerciseId) {
+        for (int i = 0; i < 5; i++) {
+            jdbcTemplate.update("""
+                INSERT INTO user_exercises (
+                    id, user_id, exercise_id, status, completed_at, attempt_number, audio_url
+                )
+                VALUES (?::uuid, ?::uuid, ?::uuid, 'COMPLETED', now() - (? || ' days')::interval, 1, 'url')
+            """, UUID.randomUUID(), userId, exerciseId, i);
+        }
+    }
+
+    protected void insertSkillTrend(){
+        for (int i = 0; i < 5; i++) {
+            jdbcTemplate.update("""
+                INSERT INTO ai_analysis_results (
+                    id, user_exercise_id,
+                    pronunciation_score, fluency_score, embedding_score, overall_score,
+                    created_at
+                )
+                VALUES (
+                    ?::uuid,
+                    (SELECT id FROM user_exercises LIMIT 1),
+                    90, 90, 90, 90,
+                    now() - (? || ' minutes')::interval
+                )
+            """, UUID.randomUUID(), i);
+        }
+    }
+
+    protected void seedAchievement(){
+        jdbcTemplate.update("""
+            INSERT INTO achievements (id, code, title, description)
+            VALUES (?::uuid, 'STREAK_14', 'Test', 'Test desc')
+            ON CONFLICT (code) DO NOTHING;
+        """, UUID.randomUUID());
+    }
+
     protected String loginAndGetToken() throws Exception {
 
         LoginRequest request = new LoginRequest();

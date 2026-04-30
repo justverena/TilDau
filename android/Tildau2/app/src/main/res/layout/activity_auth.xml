@@ -4,21 +4,54 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="32dp"
+    android:background="#F4F2F8"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- TITLE -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome Back!"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#1C1C1E"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login to continue your learning journey"
+        android:textSize="14sp"
+        android:textColor="#7A7A7A"
+        android:layout_marginBottom="32dp"/>
+
+    <!-- LOGIN BUTTON -->
     <Button
         android:id="@+id/btnLogin"
         android:text="Login"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="48dp"
+        android:backgroundTint="@color/main_purple"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- REGISTER BLOCK -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don't have an account yet?"
+        android:textSize="14sp"
+        android:textColor="#7A7A7A"
+        android:layout_marginBottom="6dp"/>
 
     <TextView
         android:id="@+id/tvRegister"
         android:text="Register"
-        android:textColor="@color/purple_500"
-        android:textSize="16sp"
-        android:paddingTop="16dp"
+        android:textColor="#6C4CF1"
+        android:textSize="18sp"
+        android:paddingTop="4dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_width="wrap_content"

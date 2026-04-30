@@ -1,6 +1,7 @@
 package kz.kbtu.tildau.controller;
 
 import kz.kbtu.tildau.TildauApplication;
+import kz.kbtu.tildau.service.AchievementService;
 import kz.kbtu.tildau.service.MinioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.*;
-
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -26,6 +28,9 @@ class ExerciseControllerIntegrationSuccessTest extends BaseIntegrationTest {
 
     @Autowired
     private MinioService minioService;
+
+    @Autowired
+    private AchievementService achievementService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -140,6 +145,26 @@ class ExerciseControllerIntegrationSuccessTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nextStep.type").value("EXERCISE"))
                 .andExpect(jsonPath("$.nextStep.id").exists());
+    }
+
+    @Test
+    void submitExercise_UnlocksAchievement() throws Exception {
+
+        String token = loginAndGetToken();
+
+        MockMultipartFile file =
+                new MockMultipartFile("file", "audio.wav", "audio/wav", "audio".getBytes());
+
+        mockMvc.perform(multipart("/api/exercises/{id}/submit", exerciseId)
+                        .file(file)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.newAchievements").isArray())
+                .andExpect(jsonPath("$.newAchievements.length()").value(greaterThan(0)))
+                .andExpect(jsonPath("$.newAchievements[0].code").exists())
+                .andExpect(jsonPath("$.newAchievements[*].code")
+                        .value(hasItem("GOOD_SCORE_90")));
+
     }
 
     @Test

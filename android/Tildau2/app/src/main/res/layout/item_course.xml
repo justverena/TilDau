@@ -1,78 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="270dp"
     card_view:cardCornerRadius="12dp"
     card_view:cardElevation="4dp"
     android:layout_margin="8dp"
-    android:background="@color/white">
+    android:background="@color/lightest_purple">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="15dp"
+        android:gravity="center_vertical"
+        >
 
-        <ImageView
-            android:id="@+id/ivCourseImage"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_square"
-            android:contentDescription="Course Image"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"/>
+        <androidx.cardview.widget.CardView android:id="@+id/courseCard"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#8e6d7a"
+            >
 
-        <Space
-            android:layout_width="12dp"
-            android:layout_height="0dp" />
+            <TextView
+                android:id="@+id/courseCardTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Дислалия"
+                android:textSize="10sp"
+
+                android:background="@drawable/bg_card"
+                android:backgroundTint="@color/white"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="12dp"
+                />
+
+        </androidx.cardview.widget.CardView>
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="2">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/courseTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Course Name"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:paddingTop="8dp"
+                android:maxLines="2"
+                />
 
-            <TextView
-                android:id="@+id/tvCourseType"
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Type"
-                android:textSize="14sp"
-                android:textColor="@color/gray"
-                android:layout_marginTop="4dp"/>
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                >
 
-            <TextView
-                android:id="@+id/courseDescription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Details"
-                android:textSize="14sp"
-                android:textColor="@color/gray"
-                android:layout_marginTop="4dp"/>
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_book"
+                    card_view:tint="@color/main_purple"
+                    />
 
-            <TextView
-                android:id="@+id/tvCourseDuration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Duration"
-                android:textSize="14sp"
-                android:textColor="@color/gray"
-                android:layout_marginTop="4dp"/>
+                <TextView
+                    android:id="@+id/tvCourseType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15 Exercises"
+                    android:textSize="12sp"
+                    android:textColor="@color/black"
+                    android:paddingStart="4dp"
+                    />
+
+            </LinearLayout>
+
+
         </LinearLayout>
+
+
+
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

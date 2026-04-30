@@ -9,7 +9,8 @@ import com.example.tildau.ui.profile.AccountFragment
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.tildau.ui.courses.CoursesFragment
-import com.example.tildau.ui.home.HomeFragment
+import com.example.tildau.ui.statistics.StatisticsFragment
+import androidx.navigation.findNavController
 
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -25,22 +26,20 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun setupTapbar() {
+
         findViewById<View>(R.id.btnStats).setOnClickListener {
-            val intent = Intent(this, HomeFragment::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
+            findNavController(R.id.nav_host_fragment)
+                .navigate(R.id.statisticsFragment)
         }
 
         findViewById<View>(R.id.btnLesson).setOnClickListener {
-            val intent = Intent(this, CoursesFragment::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
+            findNavController(R.id.nav_host_fragment)
+                .navigate(R.id.coursesFragment)
         }
 
         findViewById<View>(R.id.btnProfile).setOnClickListener {
-            val intent = Intent(this, AccountFragment::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
+            findNavController(R.id.nav_host_fragment)
+                .navigate(R.id.accountFragment)
         }
     }
 

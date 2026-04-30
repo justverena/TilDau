@@ -4,122 +4,196 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/bg_purple">
 
-    <!-- TITLE -->
-    <TextView
-        android:id="@+id/exerciseTitle"
+    <!-- SCROLLABLE CONTENT -->
+    <ScrollView
+        android:id="@+id/scrollContent"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#222222"
-        android:gravity="center"
-        android:layout_marginTop="48dp"
-        android:paddingHorizontal="24dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomBlock"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- INSTRUCTION -->
-    <TextView
-        android:id="@+id/exerciseInstructionText"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- HEADER -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+
+                <TextView
+                    android:id="@+id/exerciseTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Practice: Repeat After Audio"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A2E"
+                    android:layout_marginStart="12dp"/>
+            </LinearLayout>
+
+            <!-- DIVIDER -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/light_gray"/>
+
+
+            <!-- INSTRUCTION -->
+            <TextView
+                android:id="@+id/exerciseInstructionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Listen carefully and repeat."
+                android:textSize="14sp"
+                android:textColor="#6B6B7B"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"/>
+
+
+            <!-- CARD -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="64dp"
+
+                >
+
+                <LinearLayout
+                    android:id="@+id/card"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card"
+                    android:backgroundTint="@color/white"
+                    android:padding="24dp"
+                    android:gravity="center"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintDimensionRatio="4:3">
+
+                    <TextView
+                        android:id="@+id/expectedText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chair"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="#1A1A2E"
+                        android:layout_gravity="center"/>
+
+                    <!-- AUDIO PLAYER -->
+                    <LinearLayout
+                        android:id="@+id/audioContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="60dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/bg_button"
+                        android:backgroundTint="@color/lightest_purple"
+                        android:padding="4dp">
+
+                        <com.example.tildau.ui.record.AudioPlayerView
+                            android:id="@+id/audioPlayer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- WAVEFORM -->
+            <com.example.tildau.ui.record.WaveformView
+                android:id="@+id/waveformView"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginHorizontal="32dp"/>
+
+            <!-- RECORD CONTROLS -->
+            <LinearLayout
+                android:id="@+id/recordControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="10dp">
+
+                <ImageButton
+                    android:id="@+id/btnSecondaryLeft"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:visibility="gone"
+                    android:background="@drawable/btn_replay"
+                    android:layout_marginEnd="16dp"/>
+
+                <ImageButton
+                    android:id="@+id/btnRecord"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/btn_record"/>
+
+                <ImageButton
+                    android:id="@+id/btnSecondaryRight"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:visibility="gone"
+                    android:background="@drawable/btn_next"
+                    android:layout_marginStart="16dp"/>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- FIXED BOTTOM -->
+    <LinearLayout
+        android:id="@+id/bottomBlock"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="16sp"
-        android:textColor="#555555"
+        android:orientation="vertical"
         android:gravity="center"
-        android:layout_marginTop="12dp"
-        android:paddingHorizontal="32dp"
-        app:layout_constraintTop_toBottomOf="@id/exerciseTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- EXPECTED TEXT -->
-    <TextView
-        android:id="@+id/expectedText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:textColor="#222222"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@id/exerciseInstructionText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- LISTEN BUTTON -->
-    <Button
-        android:id="@+id/btnListen"
-        android:layout_width="140dp"
-        android:layout_height="48dp"
-        android:text="Listen"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:background="@drawable/bg_button"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/expectedText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- WAVEFORM -->
-    <com.example.tildau.ui.record.WaveformView
-        android:id="@+id/waveformView"
-        android:layout_width="0dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginHorizontal="32dp"
-        app:layout_constraintTop_toBottomOf="@id/btnListen"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- RECORD BUTTON -->
-    <ImageButton
-        android:id="@+id/btnRecord"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/bg_button"
-        android:src="@drawable/ic_mike"
-        android:scaleType="centerInside"
-        android:contentDescription="Record"
-        app:layout_constraintTop_toBottomOf="@id/waveformView"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="#FFFFFF" />
+        android:visibility="gone"
+        >
 
-    <!-- STOP BUTTON -->
-    <ImageButton
-        android:id="@+id/btnStop"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/bg_circle_transparent"
-        android:src="@drawable/ic_close"
-        android:scaleType="centerInside"
-        android:contentDescription="Stop"
-        android:layout_marginEnd="32dp"
-        app:layout_constraintEnd_toStartOf="@id/btnRecord"
-        app:layout_constraintTop_toTopOf="@id/btnRecord"
-        app:layout_constraintBottom_toBottomOf="@id/btnRecord"
-        app:tint="#FF4D4D"/>
+        <TextView
+            android:id="@+id/recordHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap to start recording"
+            android:textSize="12sp"
+            android:textColor="@color/text_dark"
+            android:layout_marginBottom="22dp"/>
 
-    <!-- PLAY RECORDED -->
-    <ImageButton
-        android:id="@+id/btnPlayRecord"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/bg_circle_transparent"
-        android:src="@drawable/ic_volume"
-        android:scaleType="centerInside"
-        android:contentDescription="Play Record"
-        android:layout_marginStart="32dp"
-        app:layout_constraintStart_toEndOf="@id/btnRecord"
-        app:layout_constraintTop_toTopOf="@id/btnRecord"
-        app:layout_constraintBottom_toBottomOf="@id/btnRecord"
-        app:tint="@color/main_purple"/>
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit for analysis"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/white"
+            android:paddingStart="60dp"
+            android:paddingEnd="60dp"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

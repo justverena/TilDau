@@ -1,5 +1,6 @@
 package com.example.tildau.ui.profile
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -15,7 +16,10 @@ import com.example.tildau.data.remote.UserApi
 import com.example.tildau.data.repository.UserRepository
 import com.example.tildau.ui.base.BaseActivity
 
-class ProfileEditActivity : BaseActivity() {
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+
+class ProfileEditActivity : AppCompatActivity() {
 
     private lateinit var etField: EditText
     private lateinit var btnSave: Button
@@ -24,7 +28,7 @@ class ProfileEditActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setBaseContent(R.layout.activity_profile_edit)
+        setContentView(R.layout.activity_profile_edit)
 
         val tvEditTitle: TextView = findViewById(R.id.tvEditTitle)
         val tvFieldLabel: TextView = findViewById(R.id.tvFieldLabel)
@@ -34,78 +38,78 @@ class ProfileEditActivity : BaseActivity() {
         fieldName = intent.getStringExtra("field") ?: "name"
         val currentValue = intent.getStringExtra("currentValue") ?: ""
 
-        when (fieldName.lowercase()) {
-            "name" -> {
-                tvEditTitle.text = "Edit Name"
-                tvFieldLabel.text = "Name"
-                etField.hint = "Enter new name"
-            }
-            "email" -> {
-                tvEditTitle.text = "Edit Email"
-                tvFieldLabel.text = "Email"
-                etField.hint = "Enter new email"
-            }
-            "password" -> {
-                tvEditTitle.text = "Edit Password"
-                tvFieldLabel.text = "Password"
-                etField.hint = "Enter new password"
-
-                findViewById<LinearLayout>(R.id.passwordRepeatLayout).visibility = View.VISIBLE
-                etField.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            }
-        }
+        setupUI(tvEditTitle, tvFieldLabel)
 
         etField.setText(currentValue)
+
+        initViewModel()
+        observeResult()
+
+        btnSave.setOnClickListener {
+            saveData()
+        }
+    }
+
+    private fun initViewModel() {
         val prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE)
         val token = prefs.getString("jwt_token", null)
 
         val api = ApiClient.createServiceWithToken(UserApi::class.java) { token }
         val repository = UserRepository(api)
+
         viewModel = ViewModelProvider(
             this,
             object : ViewModelProvider.Factory {
-                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProfileViewModel(repository) as T
                 }
             }
         )[ProfileViewModel::class.java]
-
-        btnSave.setOnClickListener {
-            val newValue = etField.text.toString()
-            if (newValue.isBlank()) {
-                Toast.makeText(this, "Value cannot be empty", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            var password: String? = null
-            if (fieldName.lowercase() == "password") {
-                val repeat = findViewById<EditText>(R.id.etFieldRepeat).text.toString()
-                if (repeat != newValue) {
-                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                password = newValue
-            }
-
-            val name: String? = if (fieldName.lowercase() == "name") newValue else null
-            val email: String? = if (fieldName.lowercase() == "email") newValue else null
-
-            viewModel.updateProfile(name, email, password)
-
-            viewModel.updateResult.observe(this) { result ->
-                result.onSuccess {
-                    Toast.makeText(this, "Updated successfully", Toast.LENGTH_SHORT).show()
-                    setResult(RESULT_OK, intent.apply {
-                        putExtra("field", fieldName)
-                        putExtra("value", newValue)
-                    })
-                    finish()
-                }.onFailure {
-                    Toast.makeText(this, it.message ?: "Update failed", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
     }
 
+    private fun observeResult() {
+        viewModel.updateResult.observe(this) { result ->
+            result.onSuccess {
+                setResult(RESULT_OK, Intent().apply {
+                    putExtra("field", fieldName)
+                    putExtra("value", etField.text.toString())
+                })
+                finish()
+            }.onFailure {
+                Toast.makeText(this, it.message ?: "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun saveData() {
+        val value = etField.text.toString()
+
+        if (value.isBlank()) {
+            Toast.makeText(this, "Empty field", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val name = if (fieldName == "name") value else null
+        val email = if (fieldName == "email") value else null
+        val password = if (fieldName == "password") value else null
+
+        viewModel.updateProfile(name, email, password)
+    }
+
+    private fun setupUI(title: TextView, label: TextView) {
+        when (fieldName) {
+            "name" -> {
+                title.text = "Edit Name"
+                label.text = "Name"
+            }
+            "email" -> {
+                title.text = "Edit Email"
+                label.text = "Email"
+            }
+            "password" -> {
+                title.text = "Edit Password"
+                label.text = "Password"
+            }
+        }
+    }
 }

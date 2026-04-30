@@ -4,11 +4,11 @@ import kz.kbtu.tildau.dto.ai.AnalyzeResponse;
 import kz.kbtu.tildau.dto.nextStep.NextStepResponse;
 import kz.kbtu.tildau.dto.exercise.ExerciseFullResponse;
 import kz.kbtu.tildau.dto.exercise.SubmitExerciseResponse;
+import kz.kbtu.tildau.dto.stats.AchievementResponse;
 import kz.kbtu.tildau.entity.*;
 import kz.kbtu.tildau.enums.ExerciseStatus;
 import kz.kbtu.tildau.enums.ExerciseType;
 import kz.kbtu.tildau.enums.NextStepType;
-import kz.kbtu.tildau.exception.ForbiddenException;
 import kz.kbtu.tildau.exception.NotFoundException;
 import kz.kbtu.tildau.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class ExerciseService {
     private final ProgressService progressService;
     private final NextStepService nextStepService;
     private final UserDefectTypeService userDefectTypeService;
+    private final AchievementService achievementService;
 
     private static final int PASS_THRESHOLD = 85;
 
@@ -84,17 +86,19 @@ public class ExerciseService {
             saveAnalysisResult(attempt, aiResponse);
             boolean passed = aiResponse.getOverallScore() >= PASS_THRESHOLD;
             NextStepResponse nextStep;
+            List<AchievementResponse> newAchievements = List.of();
 
             if (passed) {
                 completeAttempt(attempt);
                 progressService.handleSuccessfulAttempt(user, exercise);
+                newAchievements = achievementService.checkAchievements(userId);
                 nextStep = nextStepService.getNextStepAfterExercise(userId, exercise);
             } else {
                 failAttempt(attempt);
                 nextStep = retryExercise(exerciseId);
             }
 
-            return submitResponse(attempt, aiResponse, nextStep);
+            return submitResponse(attempt, aiResponse, nextStep, newAchievements);
 
         } catch (Exception e) {
             if (attempt.getStatus() == ExerciseStatus.PENDING) {
@@ -104,12 +108,13 @@ public class ExerciseService {
         }
     }
 
-    private SubmitExerciseResponse submitResponse(UserExercise attempt, AnalyzeResponse aiResponse, NextStepResponse nextStep) {
+    private SubmitExerciseResponse submitResponse(UserExercise attempt, AnalyzeResponse aiResponse, NextStepResponse nextStep, List<AchievementResponse> newAchievements) {
         return SubmitExerciseResponse.builder()
                 .attemptId(attempt.getId())
                 .overallScore(aiResponse.getOverallScore())
                 .feedback(aiResponse.getFeedback())
                 .nextStep(nextStep)
+                .newAchievements(newAchievements)
                 .build();
     }
 

@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
 import android.util.Log
+import com.example.tildau.data.model.next.NextStepResponse
+import com.example.tildau.data.model.next.NextStepType
 
 class AnalyzeFragment : Fragment() {
 
@@ -70,6 +72,8 @@ class AnalyzeFragment : Fragment() {
 
         // Подписка на состояние ViewModel
         observeState()
+//        observeNextStep()
+
 
         // Проверяем, что файл существует
         val file = File(audioPath)
@@ -82,6 +86,40 @@ class AnalyzeFragment : Fragment() {
         // Запускаем анализ
         viewModel.analyze(audioPath, exerciseId, requireActivity().applicationContext)
     }
+
+//    private fun handleNextStep(nextStep: NextStepResponse) {
+//        when (nextStep.type) {
+//            NextStepType.EXERCISE, NextStepType.RETRY -> {
+//                nextStep.id?.let { id ->
+//                    val bundle = Bundle().apply {
+//                        putString("ARG_EXERCISE_ID", id)
+//                    }
+//                    findNavController().navigate(
+//                        R.id.action_analyzeFragment_to_recordFragment,
+//                        bundle
+//                    )
+//                }
+//            }
+//            NextStepType.FINISH -> {
+//                Toast.makeText(requireContext(), "Course completed 🎉", Toast.LENGTH_LONG).show()
+//                findNavController().navigate(R.id.action_analyzeFragment_to_coursesFragment)
+//            }
+//            NextStepType.RESOURCE -> {
+//                Toast.makeText(requireContext(), "Resource step (not implemented)", Toast.LENGTH_SHORT).show()
+//            }
+//            else -> {
+//                Toast.makeText(requireContext(), "Unknown step type", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
+
+//    private fun observeNextStep() {
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewModel.nextStep.collectLatest { nextStep ->
+//                nextStep?.let { handleNextStep(it) }
+//            }
+//        }
+//    }
 
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -99,6 +137,8 @@ class AnalyzeFragment : Fragment() {
                         val bundle = Bundle().apply {
                             putInt("score", state.result.overallScore)
                             putStringArrayList("feedback", ArrayList(state.result.feedback))
+
+                            putSerializable("nextStep", state.result.nextStep)
                         }
 
                         try {

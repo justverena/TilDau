@@ -21,4 +21,5 @@ interface ExerciseApi {
         @Path("id") exerciseId: String,
         @Part file: MultipartBody.Part
     ): SubmitExerciseResponse
+
 }
