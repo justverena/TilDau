@@ -7,11 +7,10 @@ RUN apt-get update && apt-get install -y \
     libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
-
 COPY requirements.txt .
-ENV PIP_CACHE_DIR=/tmp/pip_cache
-ENV TMPDIR=/tmp
-RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 COPY . .
 

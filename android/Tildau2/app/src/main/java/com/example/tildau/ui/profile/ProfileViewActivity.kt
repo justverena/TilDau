@@ -2,14 +2,13 @@ package com.example.tildau.ui.profile
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import com.example.tildau.R
-import com.example.tildau.data.remote.ApiClient
-import com.example.tildau.ui.base.BaseActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.tildau.R
+import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.UserApi
 import com.example.tildau.data.repository.UserRepository
 
@@ -42,9 +41,34 @@ class ProfileViewActivity : AppCompatActivity() {
         initViewModel()
         loadUserData()
 
-        makeFieldClickable(tvName, "name")
-        makeFieldClickable(tvEmail, "email")
-        makeFieldClickable(tvPassword, "password")
+        setupClicks()
+    }
+
+    private fun setupClicks() {
+        findViewById<View>(R.id.tvName).parent.let {
+            (it as View).setOnClickListener {
+                openEdit("name", tvName.text.toString())
+            }
+        }
+
+        findViewById<View>(R.id.tvEmail).parent.let {
+            (it as View).setOnClickListener {
+                openEdit("email", tvEmail.text.toString())
+            }
+        }
+
+        findViewById<View>(R.id.tvPassword).parent.let {
+            (it as View).setOnClickListener {
+                openEdit("password", "")
+            }
+        }
+    }
+
+    private fun openEdit(field: String, value: String) {
+        val intent = Intent(this, ProfileEditActivity::class.java)
+        intent.putExtra("field", field)
+        intent.putExtra("currentValue", value)
+        editFieldLauncher.launch(intent)
     }
 
     private fun initViewModel() {
@@ -70,15 +94,6 @@ class ProfileViewActivity : AppCompatActivity() {
             tvName.text = user.name
             tvEmail.text = user.email
             tvPassword.text = "********"
-        }
-    }
-
-    private fun makeFieldClickable(textView: TextView, field: String) {
-        textView.setOnClickListener {
-            val intent = Intent(this, ProfileEditActivity::class.java)
-            intent.putExtra("field", field)
-            intent.putExtra("currentValue", textView.text.toString())
-            editFieldLauncher.launch(intent)
         }
     }
 }

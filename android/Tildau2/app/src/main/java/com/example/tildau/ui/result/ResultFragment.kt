@@ -1,18 +1,18 @@
 package com.example.tildau.ui.result
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.tildau.R
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.example.tildau.data.model.next.NextStepResponse
-import com.example.tildau.data.model.next.NextStepType
-import androidx.navigation.fragment.findNavController
-import com.example.tildau.navigation.NextStepHandler
+import com.example.tildau.data.model.stats.AchievementResponse
+import com.example.tildau.navigation.CourseFlowCoordinator
+import com.example.tildau.ui.achievements.AchievementUnlockedDialogFragment
 
 class ResultFragment : Fragment() {
 
@@ -26,14 +26,18 @@ class ResultFragment : Fragment() {
     private lateinit var backButton: ImageView
     private lateinit var feedbackContainer: LinearLayout
 
+    // ✅ coordinator теперь нормально инициализирован
+    private val coordinator by lazy {
+        CourseFlowCoordinator(findNavController())
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view = inflater.inflate(R.layout.fragment_result, container, false)
 
-        // Инициализация всех view
         circleProgress = view.findViewById(R.id.circle_progress)
         scoreNumber = view.findViewById(R.id.score_number)
         resultStatus = view.findViewById(R.id.result_status)
@@ -48,11 +52,25 @@ class ResultFragment : Fragment() {
     }
 
     private fun setupViews() {
+
         val score = arguments?.getInt("score") ?: 0
         val feedback = arguments?.getStringArrayList("feedback") ?: arrayListOf()
 
-        nextStep = arguments?.getSerializable("nextStep") as NextStepResponse
-        // Настраиваем прогресс и текст
+        // ⚠️ безопасный cast (иначе crash)
+        nextStep = arguments?.getSerializable("nextStep") as? NextStepResponse
+            ?: return
+
+        val achievements =
+            arguments?.getSerializable("achievements")
+                    as? ArrayList<AchievementResponse>
+                ?: arrayListOf()
+
+        if (achievements.isNotEmpty()) {
+            AchievementUnlockedDialogFragment(
+                achievements.first()
+            ).show(parentFragmentManager, "achievement_dialog")
+        }
+
         circleProgress.progress = score
         scoreNumber.text = score.toString()
 
@@ -63,31 +81,30 @@ class ResultFragment : Fragment() {
             else -> "Try Again"
         }
 
-        // Очистка контейнера на всякий случай
         feedbackContainer.removeAllViews()
 
-        // Динамическое добавление карточек
         feedback.forEach { text ->
-            val card = layoutInflater.inflate(R.layout.view_insight_card, feedbackContainer, false)
+            val card = layoutInflater.inflate(
+                R.layout.view_insight_card,
+                feedbackContainer,
+                false
+            )
+
             val insightText = card.findViewById<TextView>(R.id.insight_text)
             insightText.text = text
             feedbackContainer.addView(card)
         }
 
-        // Кнопки
+        // =========================
+        // NAVIGATION THROUGH COORDINATOR ONLY
+        // =========================
+
         nextLessonBtn.setOnClickListener {
-            NextStepHandler.handle(this, nextStep)
+            coordinator.handleNextStep(nextStep)
         }
 
-//        retryPracticeBtn.setOnClickListener {
-//            NextStepHandler.handle(
-//                this,
-//                nextStep.copy(type = NextStepType.RETRY)
-//            )
-//        }
-
         retryPracticeBtn.setOnClickListener {
-            NextStepHandler.handle(this, nextStep)
+            coordinator.handleNextStep(nextStep)
         }
 
         backButton.setOnClickListener {

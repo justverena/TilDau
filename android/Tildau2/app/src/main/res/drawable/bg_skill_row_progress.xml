@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- BACKGROUND (full track) -->
+    <item>
+        <shape>
+            <solid android:color="#F4F0FF"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+
+    <!-- FILL (will be controlled in code via level) -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <solid android:color="@color/light_purple"/>
+                <corners android:radius="14dp"/>
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

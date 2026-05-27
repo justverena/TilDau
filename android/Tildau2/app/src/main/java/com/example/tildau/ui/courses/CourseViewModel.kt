@@ -20,7 +20,6 @@ class CourseViewModel(
     val selectedCourse: LiveData<CourseFullResponse> = _selectedCourse
 
     private val _loading = MutableLiveData<Boolean>()
-    val loading: LiveData<Boolean> = _loading
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error

@@ -22,7 +22,6 @@ import com.example.tildau.data.repository.CourseRepository
 import com.example.tildau.databinding.FragmentCourseBinding
 import com.example.tildau.ui.courses.CourseViewModel
 import com.example.tildau.ui.courses.CourseViewModelFactory
-import com.example.tildau.navigation.NextStepHandler
 import kotlinx.coroutines.launch
 
 class CourseFragment : Fragment() {
@@ -34,9 +33,6 @@ class CourseFragment : Fragment() {
 
     companion object {
         const val ARG_COURSE_ID = "courseId"
-        fun newInstance(courseId: String) = CourseFragment().apply {
-            arguments = Bundle().apply { putString(ARG_COURSE_ID, courseId) }
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =

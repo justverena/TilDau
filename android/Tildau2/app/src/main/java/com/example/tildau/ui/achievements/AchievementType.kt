@@ -2,15 +2,20 @@ package com.example.tildau.ui.achievements
 
 enum class AchievementType {
 
-    STABLE_START,
-    STEADY_PACE,
-    CONTROL_UNDER_LOAD,
+    // STREAK
+    STREAK_3,
+    STREAK_7,
+    STREAK_14,
 
-    CLEAR_PROGRESS,
-    PRECISION_FOCUS,
-    HIGH_STANDARD,
+    // SKILL
+    GOOD_SCORE_90,
+    GOOD_SCORE_90_3,
+    GOOD_SCORE_90_5,
 
-    CONFIDENT_UNIT,
-    CLEAN_FINISH,
-    MASTERY
+    // UNIT
+    UNIT_90,
+    UNIT_95,
+
+    // COURSE
+    COURSE_90
 }

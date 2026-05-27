@@ -3,7 +3,6 @@ package com.example.tildau.ui.skills
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.example.tildau.R
 import com.example.tildau.databinding.ViewStatCardBinding
@@ -15,19 +14,37 @@ class StatCardView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
-    private val binding = ViewStatCardBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding: ViewStatCardBinding
 
-    /**
-     * Заполняет карточку данными
-     * @param progress Int - процент прогресса 0..100
-     * @param title String - название скилла
-     * @param backgroundColor Int? - цвет фона карточки (опционально)
-     */
-    fun bind(progress: Int, title: String, backgroundColor: Int? = null) {
-        binding.progressIndicator.progress = progress
-        binding.tvProgress.text = progress.toString()
+    init {
+        val inflater = LayoutInflater.from(context)
+
+        // ❗ ВАЖНО: правильная сигнатура inflate
+        binding = ViewStatCardBinding.inflate(inflater, this)
+
+        radius = 32f
+        cardElevation = 0f
+    }
+
+    fun setData(
+        title: String,
+        value: Int,
+        isActive: Boolean
+    ) {
         binding.tvTitle.text = title
+        binding.tvValue.text = value.toString()
+        binding.progressBar.progress = value
 
-        backgroundColor?.let { setCardBackgroundColor(ContextCompat.getColor(context, it)) }
+        val color = if (isActive) {
+            ContextCompat.getColor(context, R.color.black)
+        } else {
+            ContextCompat.getColor(context, R.color.gray)
+        }
+
+        binding.tvValue.setTextColor(color)
+    }
+
+    fun setCardColor(color: Int) {
+        setCardBackgroundColor(color)
     }
 }

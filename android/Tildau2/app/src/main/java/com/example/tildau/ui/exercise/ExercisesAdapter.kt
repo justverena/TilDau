@@ -15,13 +15,6 @@ class ExercisesAdapter(
 
     inner class ExerciseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.exerciseTitle)
-//        val instruction: TextView = itemView.findViewById(R.id.exerciseInstruction)
-
-        init {
-            itemView.setOnClickListener {
-                onExerciseClick?.invoke(exercises[adapterPosition])
-            }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExerciseViewHolder {
@@ -32,8 +25,14 @@ class ExercisesAdapter(
 
     override fun onBindViewHolder(holder: ExerciseViewHolder, position: Int) {
         val exercise = exercises[position]
+
         holder.title.text = exercise.title
-//        holder.instruction.text = exercise.instruction
+
+        holder.itemView.setOnClickListener {
+            if (!exercise.isLocked) {
+                onExerciseClick?.invoke(exercise)
+            }
+        }
 
         if (exercise.isLocked) {
             holder.itemView.alpha = 0.5f

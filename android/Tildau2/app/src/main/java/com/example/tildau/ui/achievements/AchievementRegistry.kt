@@ -7,63 +7,61 @@ object AchievementRegistry {
     fun get(type: AchievementType): Achievement {
         return when (type) {
 
-            // 🔥 STRIKES
-
-            AchievementType.STABLE_START -> Achievement(
-                title = "Stable Start",
-                description = "Practice consistently for several days with solid performance",
+            // 🔥 STREAK
+            AchievementType.STREAK_3 -> Achievement(
+                title = "Тұрақты бастау",
+                description = "3 күн қатарынан сөйлеу сапасы жақсы болды",
                 iconRes = R.drawable.ic_streak_start
             )
 
-            AchievementType.STEADY_PACE -> Achievement(
-                title = "Steady Pace",
-                description = "Keep a full week streak with stable fluency",
+            AchievementType.STREAK_7 -> Achievement(
+                title = "Бірқалыпты қарқын",
+                description = "7 күн қатарынан сөйлеу қарқыны тұрақты",
                 iconRes = R.drawable.ic_streak_week
             )
 
-            AchievementType.CONTROL_UNDER_LOAD -> Achievement(
-                title = "Control Under Load",
-                description = "Maintain a long streak without losing quality",
+            AchievementType.STREAK_14 -> Achievement(
+                title = "Жүктемедегі бақылау",
+                description = "14 күн қатарынан жоғары сапада сөйлеу",
                 iconRes = R.drawable.ic_streak_long
             )
 
-            // 📈 SKILL GROWTH
-
-            AchievementType.CLEAR_PROGRESS -> Achievement(
-                title = "Clear Progress",
-                description = "Reach a high score in a single exercise",
+            // 📈 SKILL
+            AchievementType.GOOD_SCORE_90 -> Achievement(
+                title = "Айқын прогресс",
+                description = "Бір жаттығуда 90 және одан жоғары балл жинады",
                 iconRes = R.drawable.ic_growth_start
             )
 
-            AchievementType.PRECISION_FOCUS -> Achievement(
-                title = "Precision Focus",
-                description = "Achieve high results multiple times in a row",
+            AchievementType.GOOD_SCORE_90_3 -> Achievement(
+                title = "Дәлдікке фокус",
+                description = "Қатарынан 3 жаттығуда 90 және одан жоғары балл",
                 iconRes = R.drawable.ic_growth_precision
             )
 
-            AchievementType.HIGH_STANDARD -> Achievement(
-                title = "High Standard",
-                description = "Maintain a consistently high level of performance",
+            AchievementType.GOOD_SCORE_90_5 -> Achievement(
+                title = "Жоғары сөйлеу деңгейі",
+                description = "Қатарынан 5 жаттығуда 90 және одан жоғары балл",
                 iconRes = R.drawable.ic_growth_high
             )
 
-            // 🎓 COMPLETION
-
-            AchievementType.CONFIDENT_UNIT -> Achievement(
-                title = "Confident Unit",
-                description = "Complete a unit with a strong average score",
+            // 🎓 UNIT
+            AchievementType.UNIT_90 -> Achievement(
+                title = "Сенімді бөлім",
+                description = "Бөлім бойынша орташа балл 90 және одан жоғары",
                 iconRes = R.drawable.ic_unit_complete
             )
 
-            AchievementType.CLEAN_FINISH -> Achievement(
-                title = "Clean Finish",
-                description = "Finish a unit with excellent performance",
+            AchievementType.UNIT_95 -> Achievement(
+                title = "Таза аяқтау",
+                description = "Бөлім бойынша орташа балл 95 және одан жоғары",
                 iconRes = R.drawable.ic_unit_perfect
             )
 
-            AchievementType.MASTERY -> Achievement(
-                title = "Mastery",
-                description = "Complete the entire course",
+            // 🏁 COURSE
+            AchievementType.COURSE_90 -> Achievement(
+                title = "Шебер деңгей",
+                description = "Курсты орташа балл 90 және одан жоғары аяқтау",
                 iconRes = R.drawable.ic_mastery
             )
         }

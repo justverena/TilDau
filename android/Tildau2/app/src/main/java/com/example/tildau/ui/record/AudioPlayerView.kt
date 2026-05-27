@@ -97,7 +97,6 @@ class AudioPlayerView @JvmOverloads constructor(
     // TOGGLE
     // =========================
     private fun toggle() {
-        val player = mediaPlayer ?: return
         if (!isPrepared) return
 
         if (isPlaying) pauseInternal()
@@ -148,9 +147,6 @@ class AudioPlayerView @JvmOverloads constructor(
     // =========================
     // PUBLIC API
     // =========================
-    fun play() {
-        if (isPrepared) playInternal()
-    }
 
     fun pause() {
         pauseInternal()

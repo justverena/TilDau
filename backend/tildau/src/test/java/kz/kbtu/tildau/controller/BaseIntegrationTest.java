@@ -60,10 +60,10 @@ public abstract class BaseIntegrationTest {
 
     @DynamicPropertySource
     static void minioProperties(DynamicPropertyRegistry registry) {
-        registry.add("minio.url", minioContainer::getS3URL);
+        registry.add("minio.endpoint", minioContainer::getS3URL);
+        registry.add("minio.public-url", minioContainer::getS3URL);
         registry.add("minio.access-key", minioContainer::getUserName);
         registry.add("minio.secret-key", minioContainer::getPassword);
-        registry.add("minio.url-expiration-minutes", () -> 60L);
     }
     @BeforeAll
     static void setupBucket() throws Exception {

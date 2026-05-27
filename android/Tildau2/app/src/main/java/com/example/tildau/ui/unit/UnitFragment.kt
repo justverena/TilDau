@@ -29,13 +29,6 @@ class UnitFragment : Fragment() {
     companion object {
         const val ARG_UNIT = "ARG_UNIT"
 
-        fun newInstance(unit: UnitResponse): UnitFragment {
-            val fragment = UnitFragment()
-            val bundle = Bundle()
-            bundle.putSerializable(ARG_UNIT, unit)
-            fragment.arguments = bundle
-            return fragment
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

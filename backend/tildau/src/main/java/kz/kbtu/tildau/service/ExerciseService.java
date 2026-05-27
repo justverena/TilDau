@@ -54,7 +54,7 @@ public class ExerciseService {
             response.setReferenceAudioUrl(null);
         } else if(exercise.getExerciseType() == ExerciseType.REPEAT_AFTER_AUDIO){
             if (exercise.getReferenceAudioUrl() != null) {
-                response.setReferenceAudioUrl(minioService.getPresignedUrl(exercise.getReferenceAudioUrl()));
+                response.setReferenceAudioUrl(minioService.getFileUrl(exercise.getReferenceAudioUrl()));
                 response.setExpectedText(null);
             } else {
                 throw new NotFoundException("Reference audio not found");

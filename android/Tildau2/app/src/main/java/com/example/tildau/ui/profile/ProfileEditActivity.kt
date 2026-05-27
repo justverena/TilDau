@@ -4,20 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.tildau.R
 import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.UserApi
 import com.example.tildau.data.repository.UserRepository
-import com.example.tildau.ui.base.BaseActivity
-
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
 
 class ProfileEditActivity : AppCompatActivity() {
 
@@ -32,21 +26,70 @@ class ProfileEditActivity : AppCompatActivity() {
 
         val tvEditTitle: TextView = findViewById(R.id.tvEditTitle)
         val tvFieldLabel: TextView = findViewById(R.id.tvFieldLabel)
+        val passwordRepeatLayout: LinearLayout = findViewById(R.id.passwordRepeatLayout)
+        val etRepeat: EditText = findViewById(R.id.etFieldRepeat)
+
         etField = findViewById(R.id.etField)
         btnSave = findViewById(R.id.btnSave)
 
         fieldName = intent.getStringExtra("field") ?: "name"
         val currentValue = intent.getStringExtra("currentValue") ?: ""
 
-        setupUI(tvEditTitle, tvFieldLabel)
+        // UI настройка
+        when (fieldName) {
+            "name" -> {
+                tvEditTitle.text = "Edit Name"
+                tvFieldLabel.text = "Name"
+            }
+            "email" -> {
+                tvEditTitle.text = "Edit Email"
+                tvFieldLabel.text = "Email"
+            }
+            "password" -> {
+                tvEditTitle.text = "Edit Password"
+                tvFieldLabel.text = "Password"
+                passwordRepeatLayout.visibility = View.VISIBLE
+                etField.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+        }
 
         etField.setText(currentValue)
 
         initViewModel()
-        observeResult()
+
+        viewModel.updateResult.observe(this) { result ->
+            result.onSuccess {
+                setResult(RESULT_OK, Intent().apply {
+                    putExtra("field", fieldName)
+                    putExtra("value", etField.text.toString())
+                })
+                finish()
+            }.onFailure {
+                Toast.makeText(this, it.message ?: "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         btnSave.setOnClickListener {
-            saveData()
+            val value = etField.text.toString()
+
+            if (value.isBlank()) {
+                Toast.makeText(this, "Field is empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (fieldName == "password") {
+                val repeat = etRepeat.text.toString()
+                if (repeat != value) {
+                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
+            val name = if (fieldName == "name") value else null
+            val email = if (fieldName == "email") value else null
+            val password = if (fieldName == "password") value else null
+
+            viewModel.updateProfile(name, email, password)
         }
     }
 
@@ -65,51 +108,5 @@ class ProfileEditActivity : AppCompatActivity() {
                 }
             }
         )[ProfileViewModel::class.java]
-    }
-
-    private fun observeResult() {
-        viewModel.updateResult.observe(this) { result ->
-            result.onSuccess {
-                setResult(RESULT_OK, Intent().apply {
-                    putExtra("field", fieldName)
-                    putExtra("value", etField.text.toString())
-                })
-                finish()
-            }.onFailure {
-                Toast.makeText(this, it.message ?: "Error", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun saveData() {
-        val value = etField.text.toString()
-
-        if (value.isBlank()) {
-            Toast.makeText(this, "Empty field", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val name = if (fieldName == "name") value else null
-        val email = if (fieldName == "email") value else null
-        val password = if (fieldName == "password") value else null
-
-        viewModel.updateProfile(name, email, password)
-    }
-
-    private fun setupUI(title: TextView, label: TextView) {
-        when (fieldName) {
-            "name" -> {
-                title.text = "Edit Name"
-                label.text = "Name"
-            }
-            "email" -> {
-                title.text = "Edit Email"
-                label.text = "Email"
-            }
-            "password" -> {
-                title.text = "Edit Password"
-                label.text = "Password"
-            }
-        }
     }
 }

@@ -25,9 +25,6 @@ class AuthRepository(
         )
     }
 
-    suspend fun getDefectTypes() =
-        api.getDefectTypes()
-
     suspend fun setDefect(id: Int) {
         android.util.Log.d("DEFECT_FLOW", "API CALL setDefect id=$id")
         api.setDefect(SetDefectRequest(id))

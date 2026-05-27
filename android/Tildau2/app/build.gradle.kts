@@ -16,12 +16,16 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "MINIO_URL", "\"http://10.0.2.2:9000/\"")
     }
 
     buildTypes {
         debug {
             // Для разработки через adb reverse
             buildConfigField("String", "BASE_URL", "\"http://localhost:8080/\"")
+
+            buildConfigField("String", "MINIO_URL", "\"http://10.0.2.2:9000\"")
         }
         release {
             isMinifyEnabled = false
@@ -31,12 +35,16 @@ android {
             )
             // URL для продакшена (реальный сервер)
             buildConfigField("String", "BASE_URL", "\"https://api.tildau.kz/\"")
+
+            buildConfigField("String", "MINIO_URL", "\"https://storage.tildau.kz/\"")
         }
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -66,6 +74,7 @@ dependencies {
     implementation(libs.retrofitGson)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
     implementation(libs.identity.jvm)
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
@@ -80,4 +89,8 @@ dependencies {
 
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
 }

@@ -9,7 +9,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.tildau.databinding.FragmentAccountBinding
 import com.example.tildau.ui.login.AuthActivity
-import com.example.tildau.ui.login.LoginActivity
+import androidx.navigation.fragment.findNavController
+import com.example.tildau.R
 
 class AccountFragment : Fragment() {
 
@@ -41,6 +42,10 @@ class AccountFragment : Fragment() {
             val intent = Intent(requireContext(), AuthActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
+        }
+
+        binding.statisticsRow.setOnClickListener {
+            findNavController().navigate(R.id.statisticsFragment)
         }
     }
 

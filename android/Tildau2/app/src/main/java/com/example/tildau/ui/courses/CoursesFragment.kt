@@ -21,7 +21,6 @@ import com.example.tildau.databinding.FragmentCoursesBinding
 import androidx.navigation.fragment.findNavController
 import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
-import com.example.tildau.navigation.NextStepHandler
 import com.example.tildau.ui.onboarding.DefectOnboardingActivity
 import kotlinx.coroutines.launch
 
@@ -50,6 +49,8 @@ class CoursesFragment : Fragment() {
         setupRecycler()
         setupViewModel()
         observeViewModel()
+
+
 
         viewModel.loadCourses()
     }

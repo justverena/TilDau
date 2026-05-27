@@ -31,9 +31,6 @@ class RegisterViewModel(
     suspend fun login(email: String, password: String) =
         repository.login(email, password)
 
-    suspend fun checkDefects(): Boolean {
-        return repository.checkDefects()
-    }
 
     fun register(context: Context) {
         val email = email

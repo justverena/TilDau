@@ -104,13 +104,13 @@ class ExerciseServiceTest {
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userDefectTypeService.getUserDefectOrThrow(userId)).thenReturn(articulationDefect);
         when(exerciseRepository.findByIdAndUnit_Course_DefectType_Id(exerciseId, articulationDefect.getId())).thenReturn(Optional.of(exercise));
-        when(minioService.getPresignedUrl("exercise/audio.wav")).thenReturn("https://presigned-url");
+        when(minioService.getFileUrl("exercise/audio.wav")).thenReturn("https://file-url");
 
         ExerciseFullResponse result = exerciseService.getExercise(userId, exerciseId);
 
         assertEquals(ExerciseType.REPEAT_AFTER_AUDIO, result.getExerciseType());
         assertNull(result.getExpectedText());
-        assertEquals("https://presigned-url", result.getReferenceAudioUrl());
+        assertEquals("https://file-url", result.getReferenceAudioUrl());
         verify(progressService).validateExerciseAccess(user, exercise);
     }
 

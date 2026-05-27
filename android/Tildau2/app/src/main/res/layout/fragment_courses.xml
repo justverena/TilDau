@@ -22,7 +22,7 @@
 
         <TextView
             android:id="@+id/titleHeader"
-            android:text="Lesson"
+            android:text="Your Courses"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_width="wrap_content"
@@ -89,4 +89,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchBar"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

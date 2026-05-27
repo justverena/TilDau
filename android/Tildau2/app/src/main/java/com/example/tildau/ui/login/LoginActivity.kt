@@ -5,15 +5,12 @@ import android.os.Bundle
 import android.text.InputType
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.tildau.R
-import com.example.tildau.data.local.TokenManager
 import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
 import com.example.tildau.databinding.ActivityLoginBinding
-import com.example.tildau.ui.home.HomeFragment
 import com.example.tildau.ui.main.MainActivity
 import com.example.tildau.ui.onboarding.DefectOnboardingActivity
 
@@ -29,12 +26,9 @@ class LoginActivity : AppCompatActivity() {
 
         val api = ApiClient.createService(AuthApi::class.java)
         val repository = AuthRepository(api)
+        val factory = LoginViewModelFactory(repository)
 
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return LoginViewModel(repository) as T
-            }
-        })[LoginViewModel::class.java]
+        viewModel = ViewModelProvider(this, factory)[LoginViewModel::class.java]
 
         // Переключатель видимости пароля
         var isPasswordVisible = false

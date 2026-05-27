@@ -10,14 +10,6 @@ import android.annotation.SuppressLint
 
 class WavAudioRecorder(private val context: Context) {
 
-    private enum class RecordingState {
-        IDLE,
-        RECORDING,
-        FINISHED
-    }
-
-    private var currentState = RecordingState.IDLE
-
     private val sampleRate = 44100
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
@@ -161,7 +153,6 @@ class WavAudioRecorder(private val context: Context) {
 
     private fun writeWavHeaderRandomAccess(raf: RandomAccessFile, totalAudioLen: Int) {
         val totalDataLen = totalAudioLen + 36
-        val byteRate = sampleRate * 2
 
         raf.seek(4)
         raf.writeInt(Integer.reverseBytes(totalDataLen))

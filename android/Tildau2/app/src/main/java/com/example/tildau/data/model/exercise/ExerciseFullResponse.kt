@@ -6,7 +6,7 @@ data class ExerciseFullResponse(
     val id: String,
     val title: String,
     val instruction: String,
-    val exerciseType: String, // "READ_ALOUD" или "REPEAT_AFTER_AUDIO"
+    val exerciseType: ExerciseType,
     val expectedText: String?,
     val referenceAudioUrl: String?
 ) : Serializable

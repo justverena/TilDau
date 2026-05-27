@@ -7,8 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
-import androidx.core.content.ContextCompat
 import kotlin.math.min
+import androidx.core.graphics.withRotation
 
 class LoadingWheelView @JvmOverloads constructor(
     context: Context,
@@ -59,15 +59,15 @@ class LoadingWheelView @JvmOverloads constructor(
             val index = (i + currentStep) % numberOfBars
             paint.color = barColors[index]
 
-            canvas.save()
-            canvas.rotate(i * angleStep, cx, cy)
-            canvas.drawLine(
-                cx,
-                cy - radius,
-                cx,
-                cy - radius * 0.6f,
-                paint)
-            canvas.restore()
+            canvas.withRotation(i * angleStep, cx, cy) {
+                drawLine(
+                    cx,
+                    cy - radius,
+                    cx,
+                    cy - radius * 0.6f,
+                    paint
+                )
+            }
         }
     }
 

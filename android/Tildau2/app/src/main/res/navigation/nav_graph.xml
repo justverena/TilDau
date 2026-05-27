@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/coursesFragment">
+    app:startDestination="@id/homeFragment">
 
     <action
         android:id="@+id/action_global_recordFragment"
@@ -11,7 +11,13 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.tildau.ui.home.HomeFragment"
-        android:label="Home" />
+        android:label="Home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_courseFragment"
+            app:destination="@id/courseFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/analyzeFragment"

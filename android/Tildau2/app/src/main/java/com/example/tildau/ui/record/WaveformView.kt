@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import kotlin.math.abs
 import kotlin.math.min
+import androidx.core.graphics.toColorInt
 
 class WaveformView @JvmOverloads constructor(
     context: Context,
@@ -19,7 +20,7 @@ class WaveformView @JvmOverloads constructor(
     private val barSpace = 12f
 
     private val paint = Paint().apply {
-        color = Color.parseColor("#AF99FF")
+        color = "#AF99FF".toColorInt()
         strokeCap = Paint.Cap.ROUND
         strokeWidth = barWidth
         isAntiAlias = true

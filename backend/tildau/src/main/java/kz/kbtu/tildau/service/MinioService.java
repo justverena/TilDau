@@ -1,9 +1,7 @@
 package kz.kbtu.tildau.service;
 
-import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,36 +10,28 @@ import java.io.ByteArrayInputStream;
 @Service
 public class MinioService {
     private final MinioClient minioClient;
-    private final long urlExpirationSeconds;
+    private final String publicUrl;
+    private final String bucket;
 
-    public MinioService(@Value("${minio.url}") String endpoint,
+    public MinioService(@Value("${minio.endpoint}") String endpoint,
+                        @Value("${minio.public-url}") String publicUrl,
                         @Value("${minio.access-key}") String accessKey,
                         @Value("${minio.secret-key}") String secretKey,
-                        @Value("${minio.url-expiration-minutes}") long urlExpirationMinutes) {
+                        @Value("${minio.bucket.tildau}") String bucket) {
         this.minioClient = MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
-        this.urlExpirationSeconds = urlExpirationMinutes * 60;
+        this.publicUrl = publicUrl;
+        this.bucket = bucket;
     }
 
-    public String getPresignedUrl(String objectName) {
-        try{
-            return minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .method(Method.GET)
-                            .bucket("tildau")
-                            .object(objectName)
-                            .expiry((int) urlExpirationSeconds)
-                            .build()
-            );
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to generate presigned URL for " + objectName, ex);
-        }
+    public String getFileUrl(String objectName) {
+        return "/storage/" + objectName;
     }
 
     public void putObject(String objectName, byte[] data) {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(data)) {
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket("tildau")
+                            .bucket(bucket)
                             .object(objectName)
                             .stream(bais, data.length, -1)
                             .build()

@@ -15,6 +15,10 @@ class CalendarAdapter(
     class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val number: TextView = view.findViewById(R.id.tvNumber)
         val streak: ImageView = view.findViewById(R.id.ivStreak)
+
+        val bgCircle: View = view.findViewById(R.id.bgCircle)
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
@@ -33,6 +37,27 @@ class CalendarAdapter(
             holder.itemView.visibility = View.VISIBLE
 
             holder.number.text = day.number.toString()
+
+            if (day.isToday) {
+
+                holder.bgCircle.setBackgroundResource(
+                    R.drawable.bg_today_circle
+                )
+
+                holder.number.setTextColor(
+                    holder.itemView.context.getColor(R.color.white)
+                )
+
+            } else {
+
+                holder.bgCircle.setBackgroundResource(
+                    R.drawable.bg_day_circle
+                )
+
+                holder.number.setTextColor(
+                    holder.itemView.context.getColor(R.color.white)
+                )
+            }
 
             holder.streak.visibility =
                 if (day.isStreak) View.VISIBLE else View.GONE

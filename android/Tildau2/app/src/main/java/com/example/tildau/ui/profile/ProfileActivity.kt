@@ -6,29 +6,28 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.tildau.R
 import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.UserApi
 import com.example.tildau.data.repository.UserRepository
 import com.example.tildau.databinding.ActivityProfileBinding
-import com.example.tildau.ui.base.BaseActivity
 
-class ProfileActivity : BaseActivity() {
+class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileBinding
     private lateinit var viewModel: ProfileViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityProfileBinding.inflate(layoutInflater)
-        setBaseContent(R.layout.activity_profile)
+        setContentView(binding.root)
 
-        val nameFromView = intent.getStringExtra("name")
-        val emailFromView = intent.getStringExtra("email")
+        initViewModel()
+        initUi()
+        observeViewModel()
+    }
 
-        binding.etName.setText(nameFromView)
-        binding.etEmail.setText(emailFromView)
-
+    private fun initViewModel() {
         val prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE)
         val token = prefs.getString("jwt_token", null)
 
@@ -43,12 +42,14 @@ class ProfileActivity : BaseActivity() {
                 }
             }
         )[ProfileViewModel::class.java]
+    }
 
-        viewModel.loadProfile()
-        viewModel.user.observe(this) { user ->
-            binding.etName.setText(user.name)
-            binding.etEmail.setText(user.email)
-        }
+    private fun initUi() {
+        val nameFromView = intent.getStringExtra("name")
+        val emailFromView = intent.getStringExtra("email")
+
+        binding.etName.setText(nameFromView)
+        binding.etEmail.setText(emailFromView)
 
         binding.btnSave.setOnClickListener {
             viewModel.updateProfile(
@@ -56,6 +57,15 @@ class ProfileActivity : BaseActivity() {
                 binding.etEmail.text.toString(),
                 binding.etPassword.text.toString().takeIf { it.isNotBlank() }
             )
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.loadProfile()
+
+        viewModel.user.observe(this) { user ->
+            binding.etName.setText(user.name)
+            binding.etEmail.setText(user.email)
         }
 
         viewModel.updateResult.observe(this) { result ->
@@ -67,7 +77,11 @@ class ProfileActivity : BaseActivity() {
                 setResult(RESULT_OK, data)
                 finish()
             }.onFailure {
-                Toast.makeText(this, it.message ?: "Update failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    it.message ?: "Update failed",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

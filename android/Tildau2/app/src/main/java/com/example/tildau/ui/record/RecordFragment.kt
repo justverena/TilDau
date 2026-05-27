@@ -1,19 +1,17 @@
 package com.example.tildau.ui.record
 
 import android.Manifest
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.tildau.R
-import com.example.tildau.data.local.TokenManager
-import com.example.tildau.data.model.exercise.ExerciseFullResponse
-import com.example.tildau.data.remote.ApiClient
-import com.example.tildau.data.remote.ExerciseApi
 import com.example.tildau.databinding.FragmentRecordBinding
 import kotlinx.coroutines.launch
 
@@ -22,20 +20,13 @@ class RecordFragment : Fragment() {
     private var _binding: FragmentRecordBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var exerciseId: String
-    private var fullExercise: ExerciseFullResponse? = null
+    private val viewModel: RecordViewModel by viewModels()
 
-    private lateinit var recorder: WavAudioRecorder
+    private lateinit var exerciseId: String
+    private lateinit var recordManager: RecordManager
     private lateinit var audioPlayer: AudioPlayerView
 
-    private enum class RecordingState {
-        IDLE,
-        RECORDING,
-        FINISHED,
-        PLAYING
-    }
-
-    private var currentState = RecordingState.IDLE
+    private var recordedAudioPlayer: MediaPlayer? = null
 
     // =========================
     // PERMISSION
@@ -54,6 +45,9 @@ class RecordFragment : Fragment() {
         private const val ARG_EXERCISE_ID = "ARG_EXERCISE_ID"
     }
 
+    // =========================
+    // LIFECYCLE
+    // =========================
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -77,49 +71,117 @@ class RecordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recorder = WavAudioRecorder(requireContext())
+        setupManagers()
+        setupUI()
+        observeViewModel()
+
+        viewModel.loadExercise(exerciseId)
+    }
+
+    // =========================
+    // SETUP
+    // =========================
+    private fun setupManagers() {
+        recordManager = RecordManager(WavAudioRecorder(requireContext()))
         audioPlayer = binding.audioPlayer
 
-        // ✅ completion callback ОДИН РАЗ
-        audioPlayer.setOnCompletionListener {
-            updateUI(RecordingState.FINISHED)
+        recordManager.onAmplitudeChanged = { amplitude ->
+            requireActivity().runOnUiThread {
+                binding.waveformView.addAmplitude(amplitude)
+            }
         }
 
-        updateUI(RecordingState.IDLE)
-        fetchFullExercise()
-        setupRecording()
+    }
+
+    private fun setupUI() {
+
+        binding.btnRecord.setOnClickListener {
+            when (viewModel.uiState.value) {
+
+                RecordViewModel.RecordingState.IDLE -> {
+                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+
+                RecordViewModel.RecordingState.RECORDING -> {
+                    recordManager.stopRecording()
+                    viewModel.setState(RecordViewModel.RecordingState.FINISHED)
+                }
+
+                RecordViewModel.RecordingState.FINISHED -> {
+                    playRecordedAudio()
+                }
+
+                RecordViewModel.RecordingState.PLAYING -> {
+                    stopPlayback()
+                    viewModel.setState(RecordViewModel.RecordingState.FINISHED)
+                }
+            }
+        }
+
+        binding.btnSecondaryLeft.setOnClickListener {
+            cancelRecording()
+        }
+
+        binding.btnSecondaryRight.setOnClickListener {
+            stopRecordingAndNavigate()
+        }
+    }
+
+    // =========================
+    // OBSERVE
+    // =========================
+    private fun observeViewModel() {
+
+        lifecycleScope.launch {
+            viewModel.uiState.collect { state ->
+                updateUI(state)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.exercise.collect { exercise ->
+                exercise?.let { bindExerciseUI(it) }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.error.collect { error ->
+                error?.let {
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     // =========================
     // UI STATE
     // =========================
-    private fun updateUI(state: RecordingState) {
-        currentState = state
+    private fun updateUI(state: RecordViewModel.RecordingState) {
 
         when (state) {
 
-            RecordingState.IDLE -> {
+            RecordViewModel.RecordingState.IDLE -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_record)
                 binding.btnSecondaryLeft.visibility = View.GONE
                 binding.btnSecondaryRight.visibility = View.GONE
                 binding.recordHint.text = "Tap to start recording"
             }
 
-            RecordingState.RECORDING -> {
+            RecordViewModel.RecordingState.RECORDING -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_pause)
                 binding.btnSecondaryLeft.visibility = View.GONE
                 binding.btnSecondaryRight.visibility = View.GONE
                 binding.recordHint.text = "Recording..."
             }
 
-            RecordingState.FINISHED -> {
+            RecordViewModel.RecordingState.FINISHED -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_play2)
                 binding.btnSecondaryLeft.visibility = View.VISIBLE
                 binding.btnSecondaryRight.visibility = View.VISIBLE
                 binding.recordHint.text = "Tap to play recording"
             }
 
-            RecordingState.PLAYING -> {
+            RecordViewModel.RecordingState.PLAYING -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_pause)
                 binding.btnSecondaryLeft.visibility = View.VISIBLE
                 binding.btnSecondaryRight.visibility = View.VISIBLE
@@ -129,93 +191,83 @@ class RecordFragment : Fragment() {
     }
 
     // =========================
-    // SETUP RECORDING
-    // =========================
-    private fun setupRecording() {
-
-        binding.btnRecord.setOnClickListener {
-            when (currentState) {
-
-                RecordingState.IDLE -> {
-                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                }
-
-                RecordingState.RECORDING -> {
-                    stopRecording()
-                    updateUI(RecordingState.FINISHED)
-                }
-
-                RecordingState.FINISHED -> {
-                    playRecordedAudio()
-                }
-
-                RecordingState.PLAYING -> {
-                    stopPlayback()
-                    updateUI(RecordingState.FINISHED)
-                }
-            }
-        }
-
-        binding.btnSecondaryLeft.setOnClickListener {
-            cancelRecording()
-            updateUI(RecordingState.IDLE)
-        }
-
-        binding.btnSecondaryRight.setOnClickListener {
-            stopRecordingAndNavigate()
-        }
-
-        recorder.onAmplitudeChanged = { amplitude ->
-            requireActivity().runOnUiThread {
-                binding.waveformView.addAmplitude(amplitude)
-            }
-        }
-    }
-
-    // =========================
     // RECORDING
     // =========================
     private fun startRecording() {
-        recorder.startRecording()
-        updateUI(RecordingState.RECORDING)
-    }
-
-    private fun stopRecording() {
-        recorder.stopRecording()
+        recordManager.startRecording()
+        viewModel.setState(RecordViewModel.RecordingState.RECORDING)
     }
 
     private fun cancelRecording() {
-        recorder.stopRecording()
+        recordManager.cancelRecording()
         binding.waveformView.clear()
+        viewModel.setState(RecordViewModel.RecordingState.IDLE)
     }
 
     // =========================
-    // PLAYBACK (FIXED)
+    // PLAYBACK
     // =========================
     private fun playRecordedAudio() {
-        val path = recorder.outputFilePath ?: return
 
-        updateUI(RecordingState.PLAYING)
+        val path = recordManager.outputPath ?: return
 
-        // 🔥 автозапуск сразу после prepare
-        audioPlayer.setAudio(path, autoPlay = true)
+        stopRecordedAudioPlayback()
+
+        recordedAudioPlayer = MediaPlayer().apply {
+
+            setDataSource(path)
+
+            setOnPreparedListener {
+                start()
+
+                viewModel.setState(RecordViewModel.RecordingState.PLAYING)
+            }
+
+            setOnCompletionListener {
+
+                viewModel.setState(RecordViewModel.RecordingState.FINISHED)
+
+                release()
+                recordedAudioPlayer = null
+            }
+
+            prepareAsync()
+        }
     }
 
     private fun stopPlayback() {
-        audioPlayer.pause()
+
+        stopRecordedAudioPlayback()
+
+        viewModel.setState(RecordViewModel.RecordingState.FINISHED)
+    }
+
+    private fun stopRecordedAudioPlayback() {
+
+        recordedAudioPlayer?.apply {
+
+            if (isPlaying) {
+                stop()
+            }
+
+            release()
+        }
+
+        recordedAudioPlayer = null
     }
 
     // =========================
     // NAVIGATION
     // =========================
     private fun stopRecordingAndNavigate() {
-        val audioPath = recorder.outputFilePath ?: return
+        val audioPath = recordManager.outputPath ?: return
+        val exercise = viewModel.exercise.value
 
         val bundle = Bundle().apply {
             putString("audioPath", audioPath)
             putString("exerciseId", exerciseId)
-            putString("title", fullExercise?.title)
-            putString("subtitle", fullExercise?.instruction)
+            putString("title", exercise?.title)
+            putString("subtitle", exercise?.instruction)
         }
 
         findNavController().navigate(
@@ -225,33 +277,9 @@ class RecordFragment : Fragment() {
     }
 
     // =========================
-    // API
+    // UI BINDING
     // =========================
-    private fun fetchFullExercise() {
-
-        val api = ApiClient.createServiceWithToken(ExerciseApi::class.java) {
-            TokenManager.getToken(requireContext())
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val exercise = api.getExercise(exerciseId)
-                fullExercise = exercise
-
-                bindExerciseUI(exercise)
-
-            } catch (e: Exception) {
-                Log.e("RecordFragment", "Failed to load exercise", e)
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to load exercise",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    private fun bindExerciseUI(exercise: ExerciseFullResponse) {
+    private fun bindExerciseUI(exercise: com.example.tildau.data.model.exercise.ExerciseFullResponse) {
 
         binding.exerciseTitle.text = exercise.title
         binding.exerciseInstructionText.text = exercise.instruction
@@ -260,11 +288,14 @@ class RecordFragment : Fragment() {
             exercise.expectedText?.takeIf { it.isNotEmpty() }
                 ?: "Listen to the audio"
 
-        val hasAudio = !exercise.referenceAudioUrl.isNullOrEmpty()
+        val audioUrl = exercise.referenceAudioUrl
+            ?.replace("http://minio:9000", "http://10.0.2.2:9000")
 
-        if (hasAudio) {
+        Log.d("AUDIO_DEBUG", "FINAL PLAY URL = $audioUrl")
+
+        if (!audioUrl.isNullOrEmpty()) {
             binding.audioContainer.visibility = View.VISIBLE
-            binding.audioPlayer.setAudio(exercise.referenceAudioUrl!!)
+            binding.audioPlayer.setAudio(audioUrl)
         } else {
             binding.audioContainer.visibility = View.GONE
         }
@@ -276,7 +307,10 @@ class RecordFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        recorder.stopRecording()
+        recordManager.stopRecording()
+
+        stopRecordedAudioPlayback()
+
         audioPlayer.release()
 
         _binding = null

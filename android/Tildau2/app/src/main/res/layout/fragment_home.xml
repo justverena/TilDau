@@ -1,25 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F4F2F8">
 
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:text="Welcome!"
-        android:textSize="24sp"
-        android:layout_marginBottom="24dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <Button
-        android:id="@+id/btnEditProfile"
-        android:text="Account"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
+        <!-- HOME TITLE -->
+        <TextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textStyle="bold"
+            android:textSize="28sp"
+            android:textColor="#1C1C1E"
+            android:layout_marginBottom="16dp"/>
 
-</LinearLayout>
+        <!-- 🔥 WEEKLY CALENDAR -->
+        <com.example.tildau.ui.calendar.WeeklyCalendarView
+            android:id="@+id/weeklyCalendar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.example.tildau.ui.home.courses.YourCoursesView
+            android:id="@+id/yourCoursesView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"/>
+
+        <com.example.tildau.ui.skills.SkillsView
+            android:id="@+id/skillsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+
+        <com.example.tildau.ui.achievements.HomeAchievementsView
+            android:id="@+id/homeAchievementsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+
+    </LinearLayout>
+
+</ScrollView>
