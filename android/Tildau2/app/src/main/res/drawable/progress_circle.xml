@@ -6,17 +6,24 @@
     <shape
         android:shape="ring"
         android:useLevel="true"
-        android:thickness="2dp"
+        android:thickness="25dp"
         android:innerRadiusRatio="3.5">
-        <solid android:color="#FFFFFFFF"/> <!-- белая незаполненная часть -->
+
+        <solid android:color="@color/black"/>
     </shape>
 
     <!-- заполненная часть (progress) -->
     <shape
         android:shape="ring"
         android:useLevel="true"
-        android:thickness="4dp"
+        android:thickness="16dp"
         android:innerRadiusRatio="3.5">
-        <solid android:color="@color/text_dark"/> <!-- темная заполненная часть -->
+
+        <gradient
+            android:startColor="#6344D4"
+            android:endColor="#666344D4"
+            android:angle="45"
+            />
+
     </shape>
 </rotate>

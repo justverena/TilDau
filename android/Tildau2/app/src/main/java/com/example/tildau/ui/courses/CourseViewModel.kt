@@ -33,11 +33,11 @@ class CourseViewModel(
                     _courses.value = result
                 } else {
                     _courses.value = emptyList()
-                    _error.value = "Failed to load courses"
+                    _error.value = "Курстарды жүктеу мүмкін болмады"
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _error.value = "Error: ${e.message}"
+                _error.value = "Қате: ${e.message}"
                 _courses.value = emptyList()
             } finally {
                 _loading.value = false
@@ -52,7 +52,7 @@ class CourseViewModel(
                 if (result != null) {
                     _selectedCourse.value = result
                 } else {
-                    _error.value = "Course not found"
+                    _error.value = "Курс табылмады"
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

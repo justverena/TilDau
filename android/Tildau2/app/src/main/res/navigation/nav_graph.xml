@@ -17,6 +17,10 @@
             android:id="@+id/action_homeFragment_to_courseFragment"
             app:destination="@id/courseFragment" />
 
+        <action
+            android:id="@+id/action_homeFragment_to_achievementFragment"
+            app:destination="@id/achievementFragment"/>
+
     </fragment>
 
     <fragment
@@ -93,7 +97,21 @@
     <fragment
         android:id="@+id/accountFragment"
         android:name="com.example.tildau.ui.profile.AccountFragment"
-        android:label="Account" />
+        android:label="Account">
+
+        <action
+            android:id="@+id/action_accountFragment_to_notificationsFragment"
+            app:destination="@+id/notificationsFragment" />
+
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.example.tildau.ui.notifications.NotificationsFragment"
+        android:label="Notifications"
+        />
 
     <fragment
         android:id="@+id/recordFragment"
@@ -106,6 +124,11 @@
             app:destination="@id/analyzeFragment" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/achievementFragment"
+        android:name="com.example.tildau.ui.achievements.AchievementFragment"
+        android:label="Achievements"/>
 
     <fragment
         android:id="@+id/statisticsFragment"

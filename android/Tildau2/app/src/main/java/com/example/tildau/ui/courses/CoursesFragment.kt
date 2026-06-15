@@ -2,6 +2,7 @@ package com.example.tildau.ui.courses
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -107,6 +108,8 @@ class CoursesFragment : Fragment() {
             R.id.action_coursesFragment_to_courseFragment,
             bundle
         )
+
+        Log.d("NAV_DEBUG", "navigate to course with id = $courseId")
     }
     override fun onDestroyView() {
         super.onDestroyView()

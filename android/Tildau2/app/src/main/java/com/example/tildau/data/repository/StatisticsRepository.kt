@@ -11,4 +11,6 @@ class StatisticsRepository(
     suspend fun getSkillTrend() = api.getSkillTrend()
 
     suspend fun getCalendar() = api.getActivityCalendar()
+
+    suspend fun getAchievements() = api.getAchievements()
 }

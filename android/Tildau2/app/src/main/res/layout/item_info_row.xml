@@ -7,23 +7,23 @@
     android:layout_marginBottom="64dp"
     android:gravity="center_vertical">
 
-    <!-- Curriculum -->
+
     <TextView
         android:id="@+id/titleText"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="Curriculum"
+        android:text="Оқу жоспары"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#262626"/>
 
-    <!-- Sections -->
+
     <TextView
         android:id="@+id/sectionsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="5 Units"
+        android:text="5 бөлім"
         android:textSize="14sp"
         android:textColor="#7A7A7A"/>
 </LinearLayout>

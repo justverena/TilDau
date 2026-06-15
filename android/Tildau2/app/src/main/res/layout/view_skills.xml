@@ -4,70 +4,79 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <!-- HEADER -->
+
     <TextView
         android:id="@+id/tvSkillsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your Skills"
+        android:text="@string/your_skills"
         android:textStyle="bold"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textColor="#1C1C1E"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="8dp"/>
 
-    <!-- CARD -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Толық статистиканы көру үшін басыңыз"
+        android:textSize="13sp"
+        android:textColor="#6C4CF1"
+        android:layout_marginBottom="12dp"/>
+
+
     <androidx.cardview.widget.CardView
         android:id="@+id/skillsCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="20dp"
-        app:cardElevation="0dp"
-        app:cardBackgroundColor="@color/bg_light_purple">
+        app:cardElevation="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="13dp">
+            android:padding="13dp"
+            android:background="@drawable/bg_gradient_card2"
+            >
 
-            <!-- FLUENCY -->
+
             <TextView
                 android:id="@+id/tvFluency"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:paddingStart="12dp"
-                android:text="Fluency: 0"
+                android:text="@string/fluency"
                 android:textStyle="bold"
-                android:textSize="17dp"
+                android:textSize="15sp"
                 android:background="@drawable/bg_skill_row_progress"
                 android:textColor="#1C1C1E"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- PRONUNCIATION -->
+
             <TextView
                 android:id="@+id/tvPronunciation"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:paddingStart="12dp"
-                android:text="Pronunciation: 0"
+                android:text="@string/pronunciation"
                 android:textStyle="bold"
-                android:textSize="17dp"
+                android:textSize="15sp"
                 android:background="@drawable/bg_skill_row_progress"
                 android:textColor="#1C1C1E"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- OVERALL -->
+
             <TextView
                 android:id="@+id/tvOverall"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:paddingStart="12dp"
-                android:text="Overall: 0"
+                android:text="@string/overall"
                 android:textStyle="bold"
-                android:textSize="17dp"
+                android:textSize="15sp"
                 android:background="@drawable/bg_skill_row_progress"
                 android:textColor="#1C1C1E"/>
 

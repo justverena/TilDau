@@ -6,20 +6,21 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- HEADER -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginTop="16dp">
 
         <TextView
             android:id="@+id/tvCoursesTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Courses"
+            android:text="@string/courses"
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textColor="#1C1C1E"/>
 
         <View
@@ -31,20 +32,28 @@
             android:id="@+id/tvViewMore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="View more →"
+            android:text="@string/view_all"
             android:textSize="13sp"
             android:textColor="#6C4CF1"/>
     </LinearLayout>
 
-    <!-- COURSES -->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Сізге қолжетімді оқу курстары"
+        android:textSize="13sp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"/>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCourses"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="4dp"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
-
         android:clipToPadding="false"
         android:clipChildren="false"
         android:overScrollMode="never"

@@ -10,8 +10,8 @@
         android:padding="12dp">
 
         <FrameLayout
-            android:layout_width="70dp"
-            android:layout_height="70dp">
+            android:layout_width="90dp"
+            android:layout_height="90dp">
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -28,9 +28,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="0"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                />
 
         </FrameLayout>
 
@@ -39,9 +40,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Fluency"
             android:textSize="12sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="center"
+            />
 
     </LinearLayout>
 

@@ -5,12 +5,12 @@
     android:orientation="vertical"
     android:background="#F6F8FA">
 
-    <!-- Purple top block -->
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="80dp"
         android:orientation="vertical"
-        android:background="@color/light_purple"
+        android:background="@drawable/bg_page"
         android:gravity="center_vertical"
         android:paddingStart="24dp"
         android:paddingEnd="24dp">
@@ -18,13 +18,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Account"
-            android:textSize="28sp"
+            android:text="@string/account"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/black"/>
     </LinearLayout>
 
-    <!-- Scrollable content -->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Name -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="76dp"
@@ -51,7 +51,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Name"
+                    android:text="@string/name"
                     android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="#000000" />
@@ -60,18 +60,18 @@
                     android:id="@+id/tvName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enter your name"
+                    android:text="@string/edit_name"
                     android:textSize="13sp"
                     android:textColor="#2C2C2C" />
             </LinearLayout>
 
-            <!-- Divider -->
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#7F2F5F" />
 
-            <!-- Email -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="76dp"
@@ -86,7 +86,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Email"
+                    android:text="@string/email"
                     android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="#000000" />
@@ -95,18 +95,18 @@
                     android:id="@+id/tvEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enter your email"
+                    android:text="@string/edit_email"
                     android:textSize="13sp"
                     android:textColor="#2C2C2C" />
             </LinearLayout>
 
-            <!-- Divider -->
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#7F2F5F" />
 
-            <!-- Password -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="76dp"
@@ -121,7 +121,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Password"
+                    android:text="@string/password"
                     android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="#000000" />
@@ -135,7 +135,7 @@
                     android:textColor="#2C2C2C" />
             </LinearLayout>
 
-            <!-- Divider -->
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

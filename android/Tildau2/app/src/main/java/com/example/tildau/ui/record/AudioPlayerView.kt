@@ -2,6 +2,7 @@ package com.example.tildau.ui.record
 
 import android.content.Context
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
@@ -11,6 +12,9 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.example.tildau.R
+import androidx.core.net.toUri
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 
 class AudioPlayerView @JvmOverloads constructor(
     context: Context,
@@ -23,6 +27,8 @@ class AudioPlayerView @JvmOverloads constructor(
     private val tvDuration: TextView
 
     private var mediaPlayer: MediaPlayer? = null
+
+    private var exoPlayer: ExoPlayer? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private var updateRunnable: Runnable? = null
@@ -48,90 +54,89 @@ class AudioPlayerView @JvmOverloads constructor(
         btnPlay.setOnClickListener { toggle() }
     }
 
-    // =========================
-    // SET AUDIO (SAFE VERSION)
-    // =========================
+
+
+
     fun setAudio(path: String, autoPlay: Boolean = false) {
 
         release()
 
-        mediaPlayer = MediaPlayer().apply {
+        exoPlayer = ExoPlayer.Builder(context).build().apply {
 
-            setDataSource(path)
-            prepareAsync()
+            val mediaItem = MediaItem.fromUri(path)
+            setMediaItem(mediaItem)
 
-            setOnPreparedListener { mp ->
-                isPrepared = true
+            prepare()
 
-                progressBar.max = mp.duration
-                tvDuration.text = formatTime(mp.duration)
+            progressBar.max = 0
+            tvCurrentTime.text = "0:00"
+            tvDuration.text = "0:00"
 
-                progressBar.progress = 0
-                tvCurrentTime.text = formatTime(0)
+            addListener(object : androidx.media3.common.Player.Listener {
 
-                btnPlay.setImageResource(R.drawable.btn_play)
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    this@AudioPlayerView.isPlaying = isPlaying
+                    btnPlay.setImageResource(
+                        if (isPlaying) R.drawable.btn_pause
+                        else R.drawable.btn_play
+                    )
 
-                // 🔥 автозапуск после подготовки
-                if (autoPlay) {
-                    playInternal()
+                    if (isPlaying) startProgress()
+                    else stopProgress()
                 }
-            }
 
-            setOnCompletionListener {
-                this@AudioPlayerView.isPlaying = false
-                isPrepared = false
+                override fun onPlaybackStateChanged(state: Int) {
+                    if (state == androidx.media3.common.Player.STATE_READY) {
 
-                btnPlay.setImageResource(R.drawable.btn_play)
+                        val duration = duration.coerceAtLeast(0)
 
-                stopProgress()
+                        progressBar.max = duration.toInt()
+                        tvDuration.text = formatTime(duration.toInt())
+                    }
 
-                progressBar.progress = progressBar.max
-                tvCurrentTime.text = formatTime(progressBar.max)
+                    if (state == androidx.media3.common.Player.STATE_ENDED) {
+                        stopProgress()
+                        seekTo(0)
+                        pause()
+                        onCompletion?.invoke()
+                    }
+                }
+            })
 
-                onCompletion?.invoke()
-            }
+            if (autoPlay) play()
         }
     }
 
-    // =========================
-    // TOGGLE
-    // =========================
-    private fun toggle() {
-        if (!isPrepared) return
 
-        if (isPlaying) pauseInternal()
-        else playInternal()
+
+
+    private fun toggle() {
+        exoPlayer?.let {
+            if (it.isPlaying) it.pause()
+            else it.play()
+        }
     }
 
     private fun playInternal() {
-        mediaPlayer?.start()
-        isPlaying = true
-
-        btnPlay.setImageResource(R.drawable.btn_pause)
-
-        startProgress()
+        exoPlayer?.play()
     }
 
     private fun pauseInternal() {
-        mediaPlayer?.pause()
-        isPlaying = false
-
-        btnPlay.setImageResource(R.drawable.btn_play)
-
-        stopProgress()
+        exoPlayer?.pause()
     }
 
-    // =========================
-    // PROGRESS
-    // =========================
+
+
+
     private fun startProgress() {
         updateRunnable = object : Runnable {
             override fun run() {
-                val p = mediaPlayer ?: return
+
+                val p = exoPlayer ?: return
 
                 val pos = p.currentPosition
-                progressBar.progress = pos
-                tvCurrentTime.text = formatTime(pos)
+                progressBar.progress = pos.toInt()
+                tvCurrentTime.text = formatTime(pos.toInt())
 
                 handler.postDelayed(this, 250)
             }
@@ -144,19 +149,20 @@ class AudioPlayerView @JvmOverloads constructor(
         updateRunnable = null
     }
 
-    // =========================
-    // PUBLIC API
-    // =========================
+
+
+
 
     fun pause() {
         pauseInternal()
     }
 
     fun release() {
+
         stopProgress()
 
-        mediaPlayer?.release()
-        mediaPlayer = null
+        exoPlayer?.release()
+        exoPlayer = null
 
         isPrepared = false
         isPlaying = false
@@ -164,12 +170,11 @@ class AudioPlayerView @JvmOverloads constructor(
         btnPlay.setImageResource(R.drawable.btn_play)
 
         progressBar.progress = 0
-        tvCurrentTime.text = formatTime(0)
+        tvCurrentTime.text = "0:00"
     }
 
-    // =========================
-    // UTILS
-    // =========================
+
+
     private fun formatTime(ms: Int): String {
         val sec = ms / 1000
         return "%d:%02d".format(sec / 60, sec % 60)

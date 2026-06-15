@@ -8,9 +8,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="80dp"
         android:orientation="vertical"
-        android:background="@color/main_purple"
+        android:background="@drawable/bg_page"
         android:gravity="center_vertical"
         android:paddingStart="24dp"
         android:paddingEnd="24dp">
@@ -19,10 +19,9 @@
             android:id="@+id/tvEditTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Edit Field"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"/>
+            android:text="@string/edit"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
     <ScrollView
@@ -43,14 +42,13 @@
                 android:orientation="vertical"
                 android:padding="16dp"
                 android:src="@drawable/bg_card"
-                android:backgroundTint="@color/main_purple"
                 android:layout_marginBottom="16dp">
 
                 <TextView
                     android:id="@+id/tvFieldLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Field"
+                    android:text="@string/field"
                     android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="#000000"
@@ -60,12 +58,13 @@
                     android:id="@+id/etField"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:autofillHints=""
                     android:background="@drawable/bg_input"
+                    android:inputType="text"
                     android:padding="12dp"
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:hint="Enter value"
-                android:contentDescription="Input field"/>
+                    android:hint="@string/enter_value"/>
             </LinearLayout>
 
             <LinearLayout
@@ -74,15 +73,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp"
-                android:background="@drawable/bg_card"
-                android:backgroundTint="@color/white"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Repeat Password"
+                    android:text="@string/repeat_password"
                     android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="#000000"
@@ -92,13 +89,13 @@
                     android:id="@+id/etFieldRepeat"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:autofillHints=""
                     android:background="@drawable/bg_input"
                     android:padding="12dp"
                     android:textColor="#000000"
                     android:textSize="14sp"
                     android:inputType="textPassword"
-                    android:hint="Repeat password"
-                    android:contentDescription="Repeat password field"/>
+                    android:hint="@string/repeat_password"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -108,7 +105,7 @@
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:text="Save"
+        android:text="@string/save"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:background="@drawable/bg_button"

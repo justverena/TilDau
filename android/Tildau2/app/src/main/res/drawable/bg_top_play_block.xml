@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/main_purple" />
+<!--    <solid android:color="@color/main_purple" />-->
 
     <corners
         android:topLeftRadius="12dp"
         android:topRightRadius="12dp"
         android:bottomLeftRadius="0dp"
         android:bottomRightRadius="0dp" />
+
+    <gradient
+        android:startColor="#4323A9"
+        android:centerColor="@color/main_purple"
+        android:endColor="#4323A9"
+        android:angle="135"/>
+
+
 </shape>

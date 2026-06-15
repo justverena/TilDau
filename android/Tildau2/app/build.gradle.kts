@@ -22,10 +22,10 @@ android {
 
     buildTypes {
         debug {
-            // Для разработки через adb reverse
-            buildConfigField("String", "BASE_URL", "\"http://localhost:8080/\"")
 
-            buildConfigField("String", "MINIO_URL", "\"http://10.0.2.2:9000\"")
+
+
+
         }
         release {
             isMinifyEnabled = false
@@ -33,10 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // URL для продакшена (реальный сервер)
-            buildConfigField("String", "BASE_URL", "\"https://api.tildau.kz/\"")
 
-            buildConfigField("String", "MINIO_URL", "\"https://storage.tildau.kz/\"")
+//            buildConfigField("String", "BASE_URL", "\"https://api.tildau.kz/\"")
+//
+//            buildConfigField("String", "MINIO_URL", "\"https://storage.tildau.kz/\"")
         }
     }
 
@@ -93,4 +93,10 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     implementation("androidx.gridlayout:gridlayout:1.0.0")
+
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-ui:1.3.1")
+    implementation("androidx.media3:media3-common:1.3.1")
+
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
 }

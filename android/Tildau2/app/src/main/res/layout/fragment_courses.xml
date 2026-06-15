@@ -12,7 +12,7 @@
         android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="80dp"
-        android:background="#cfc6e8"
+        android:background="@drawable/bg_page"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -22,7 +22,7 @@
 
         <TextView
             android:id="@+id/titleHeader"
-            android:text="Your Courses"
+            android:text="Курстар"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_width="wrap_content"
@@ -47,19 +47,19 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp">
 
-        <!-- 🔍 Иконка поиска -->
+
         <ImageView
             android:layout_width="15dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_search" />
 
-        <!-- ✏️ Поле ввода -->
+
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Search Courses"
+            android:hint="Курстарды іздеу"
             android:textSize="14sp"
             android:background="@android:color/transparent"
             android:paddingStart="16dp"
@@ -67,7 +67,7 @@
             android:textColor="@color/black"
             android:textColorHint="#2F2F2F"/>
 
-        <!-- ⚙️ Иконка фильтра -->
+
         <ImageView
             android:id="@+id/btnFilter"
             android:layout_width="20dp"

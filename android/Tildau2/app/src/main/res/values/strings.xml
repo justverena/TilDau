@@ -1,3 +1,71 @@
 <resources>
     <string name="app_name">Tildau</string>
+    <string name="stuttering">Тұтығу</string>
+    <string name="articulation">Артикуляция</string>
+    <string name="name">Аты</string>
+    <string name="email">Email</string>
+    <string name="password">Құпиясөз</string>
+    <string name="enter_password">Құпиясөзді енгізіңіз</string>
+    <string name="enter_email">Email енгізіңіз</string>
+    <string name="enter_name">Атыңызды енгізіңіз</string>
+    <string name="save">Сақтау</string>
+    <string name="edit">Өзгерту</string>
+    <string name="field">Өріс</string>
+    <string name="enter_value">Мәнді енгізіңіз</string>
+    <string name="repeat_password">Құпиясөзді қайталаңыз</string>
+    <string name="account">Аккаунт</string>
+    <string name="edit_name">Атын өзгерту</string>
+    <string name="edit_email">Email өзгерту</string>
+    <string name="account_details">Аккаунт мәліметтері</string>
+    <string name="notifications">Хабарламалар</string>
+    <string name="manage_alerts">Ескертулерді басқару</string>
+    <string name="preferences">Параметрлер</string>
+    <string name="app_settings">Қосымша баптаулары</string>
+    <string name="statistics">Статистика</string>
+    <string name="your_progress">Сіздің прогресіңіз</string>
+    <string name="logout">Шығу</string>
+
+    <string name="email_empty_error">Email бос болмауы керек</string>
+    <string name="name_empty_error">Аты бос болмауы керек</string>
+    <string name="error_prefix">Қате:</string>
+    <string name="password_empty_error">Құпиясөз бос болмауы керек</string>
+    <string name="all_fields_required">Барлық өрістерді толтыру қажет</string>
+    <string name="register">Тіркелу</string>
+    <string name="login">Кіру</string>
+    <string name="continue_">Жалғастыру</string>
+    <string name="what_is_your_name">Атыңыз кім?</string>
+    <string name="create_password">Құпиясөз жасау</string>
+    <string name="enter_your_password_and_confirm_it">Құпиясөзді енгізіп, оны растаңыз</string>
+
+    <string name="fluency">Сөйлеу еркіндігі</string>
+    <string name="pronunciation">Айтылым</string>
+    <string name="overall">Жалпы нәтиже</string>
+    <string name="your_skills">Сіздің дағдыларыңыз</string>
+    <string name="ai_personalized_insights">ЖИ негізіндегі жеке ұсыныстар</string>
+    <string name="waiting_for_insights">Кеңестер дайындалып жатыр...</string>
+    <string name="exercises">15 Жаттығу</string>
+    <string name="course_name">Курстың аты</string>
+
+    <string name="practiced_days_in_row">%1$d күн қатарынан жаттықтыңыз!</string>
+
+    <string name="january">Қаңтар</string>
+    <string name="february">Ақпан</string>
+    <string name="march">Наурыз</string>
+    <string name="april">Сәуір</string>
+    <string name="may">Мамыр</string>
+    <string name="june">Маусым</string>
+    <string name="july">Шілде</string>
+    <string name="august">Тамыз</string>
+    <string name="september">Қыркүйек</string>
+    <string name="october">Қазан</string>
+    <string name="november">Қараша</string>
+    <string name="december">Желтоқсан</string>
+    <string name="practiced_5_days">5 күн қатарынан жаттықтыңыз!</string>
+    <string name="hit_weekly_goal">Тағы 2 күн жаттықсаңыз, апталық мақсатыңызға жетесіз.</string>
+    <string name="skill_trends">Дағдылар динамикасы</string>
+    <string name="achievements">Жетістіктер</string>
+    <string name="view_all">Барлығын көру →</string>
+    <string name="courses">Курстар</string>
+    <string name="loading">Жүктелуде...</string>
+
 </resources>

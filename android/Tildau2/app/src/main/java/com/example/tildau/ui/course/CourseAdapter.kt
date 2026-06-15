@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tildau.R
 import com.example.tildau.data.enums.UnitState
+import com.example.tildau.ui.courses.CourseCoverHelper
 
 class CourseAdapter(
     private var items: MutableList<CourseItem>
@@ -71,15 +72,32 @@ class CourseAdapter(
         notifyDataSetChanged()
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int
+    ) {
         when (val item = items[position]) {
-            is CourseItem.Header -> (holder as HeaderViewHolder).bind(item)
-            is CourseItem.Feature -> (holder as FeatureViewHolder).bind(item)
-            is CourseItem.Unit -> (holder as UnitViewHolder).bind(item)
-            is CourseItem.Exercise -> (holder as ExerciseViewHolder).bind(item)
-            is CourseItem.CourseCard -> (holder as CourseCardViewHolder).bind()
-            is CourseItem.InfoRow -> (holder as InfoRowViewHolder).bind(item)
-            is CourseItem.ProgressBox -> (holder as ProgressBoxViewHolder).bind(item)
+
+            is CourseItem.Header ->
+                (holder as HeaderViewHolder).bind(item)
+
+            is CourseItem.Feature ->
+                (holder as FeatureViewHolder).bind(item)
+
+            is CourseItem.Unit ->
+                (holder as UnitViewHolder).bind(item)
+
+            is CourseItem.Exercise ->
+                (holder as ExerciseViewHolder).bind(item)
+
+            is CourseItem.CourseCard ->
+                (holder as CourseCardViewHolder).bind(item.title)
+
+            is CourseItem.InfoRow ->
+                (holder as InfoRowViewHolder).bind(item)
+
+            is CourseItem.ProgressBox ->
+                (holder as ProgressBoxViewHolder).bind(item)
         }
     }
 
@@ -133,22 +151,22 @@ class CourseAdapter(
             when (unitItem.state) {
 
                 UnitState.LOCKED -> {
-                    statusPrimary.text = "Locked"
+                    statusPrimary.text = "Құлыпталған"
                     statusSecondary.visibility = View.GONE
                     numberText.setBackgroundResource(R.drawable.bg_circle_idle)
                 }
 
                 UnitState.CURRENT -> {
-                    statusPrimary.text = "In progress"
+                    statusPrimary.text = "Орындалып жатыр"
                     statusSecondary.visibility = View.VISIBLE
-                    statusSecondary.text = "Progress: ${unitItem.progress ?: 0}%"
+                    statusSecondary.text = "Орындалуы: ${unitItem.progress ?: 0}%"
                     numberText.setBackgroundResource(R.drawable.bg_circle_current)
                 }
 
                 UnitState.COMPLETED -> {
-                    statusPrimary.text = "Completed"
+                    statusPrimary.text = "Аяқталды"
                     statusSecondary.visibility = View.VISIBLE
-                    statusSecondary.text = "Last Score: ${unitItem.lastScore ?: 0}%"
+                    statusSecondary.text = "Орташа ұпай: ${unitItem.lastScore ?: 0}%"
                     numberText.setBackgroundResource(R.drawable.bg_circle_completed)
                 }
             }
@@ -223,11 +241,17 @@ class CourseAdapter(
     }
 
     // ===================== COURSE CARD =====================
-    inner class CourseCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val title: TextView = itemView.findViewById(R.id.courseCardTitle)
+    inner class CourseCardViewHolder(itemView: View)
+        : RecyclerView.ViewHolder(itemView) {
 
-        fun bind() {
-            title.text = "Дислалия"
+        private val image =
+            itemView.findViewById<ImageView>(R.id.courseImage)
+
+        fun bind(courseTitle: String) {
+
+            image.setImageResource(
+                CourseCoverHelper.getBigCover(courseTitle)
+            )
         }
     }
 
@@ -236,7 +260,7 @@ class CourseAdapter(
         private val sections: TextView = itemView.findViewById(R.id.sectionsText)
 
         fun bind(item: CourseItem.InfoRow) {
-            sections.text = "${item.sections} Sections"
+            sections.text = "${item.sections} бөлім"
         }
     }
 

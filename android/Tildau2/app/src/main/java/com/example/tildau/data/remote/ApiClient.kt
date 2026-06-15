@@ -46,10 +46,9 @@ object ApiClient {
     // Сервис без токена
     fun <T> createService(service: Class<T>): T {
 
-        Log.d(TAG, "BASE_URL = ${BuildConfig.BASE_URL}")
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(NetworkConfig.baseUrl())
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -62,10 +61,9 @@ object ApiClient {
     // Сервис с токеном
     fun <T> createServiceWithToken(service: Class<T>, tokenProvider: () -> String?): T {
 
-        Log.d(TAG, "BASE_URL WITH TOKEN = ${BuildConfig.BASE_URL}")
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(NetworkConfig.baseUrl())
             .client(clientWithToken(tokenProvider))
             .addConverterFactory(GsonConverterFactory.create())
             .build()

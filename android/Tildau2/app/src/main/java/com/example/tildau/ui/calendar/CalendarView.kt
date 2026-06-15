@@ -93,7 +93,7 @@ class CalendarView @JvmOverloads constructor(
         }
 
         tvMonth.text =
-            "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH)}, ${currentMonth.year}"
+            "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("kk"))}, ${currentMonth.year}"
 
         rvCalendar.adapter = CalendarAdapter(days)
     }

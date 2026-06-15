@@ -1,4 +1,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
-    <solid android:color="@color/bg_day_circle"/>
+    <gradient
+        android:startColor="#6438B4"
+        android:endColor="@color/bg_day_circle"
+        android:angle="135"/>
 </shape>

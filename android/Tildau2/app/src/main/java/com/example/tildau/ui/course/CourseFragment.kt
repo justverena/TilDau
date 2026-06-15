@@ -44,8 +44,26 @@ class CourseFragment : Fragment() {
         binding.courseRecyclerView.adapter = adapter
 
         val courseId = arguments?.getString(ARG_COURSE_ID)
-        if (courseId == null) { Log.d("CourseFragment", "courseId is null!"); return }
 
+        if (courseId.isNullOrEmpty()) {
+            Log.e("CourseFragment", "courseId is NULL from arguments")
+            return
+        }
+
+        Log.d("COURSE_DEBUG", "ARGUMENTS = $arguments")
+        Log.d("COURSE_DEBUG", "ALL KEYS = ${arguments?.keySet()}")
+        Log.d("COURSE_DEBUG", "onViewCreated CALLED")
+        Log.d("COURSE_DEBUG", "arguments = ${arguments?.keySet()}")
+        Log.d("COURSE_DEBUG", "courseId = ${arguments?.getString(ARG_COURSE_ID)}")
+
+// 🔥 ПЕРЕМЕСТИТЬ СЮДА И СДЕЛАТЬ ЯВНОЕ ЛОГИРОВАНИЕ
+        Log.d("COURSE_DEBUG", "Saving courseId = $courseId")
+
+        requireContext()
+            .getSharedPreferences("app_prefs", 0)
+            .edit()
+            .putString("current_course_id", courseId)
+            .apply()
         saveCurrentCourseId(courseId)
 //        setupStartButton(courseId)
 
@@ -64,7 +82,7 @@ class CourseFragment : Fragment() {
 
                 val hasDefects = authRepository.checkDefects()
                 if (!hasDefects) {
-                    Toast.makeText(requireContext(), "No access", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Қолжетімділік жоқ", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
 
@@ -114,18 +132,22 @@ class CourseFragment : Fragment() {
             .flatMap { it.exercises }
             .firstOrNull { !it.isCompleted && !it.isLocked }
 
-        items.add(CourseItem.CourseCard)
+        items.add(
+            CourseItem.CourseCard(
+                course.title
+            )
+        )
         items.add(CourseItem.Header(course.title, course.description))
         val overallProgress = course.progressPercent.toInt()
         val resumeText = if (nextExercise != null) {
-            "Continue: ${nextExercise.title}"
+            "Жалғастыру: ${nextExercise.title}"
         } else {
-            "🎉 Course completed"
+            "🎉 Курс аяқталды"
         }
 
         items.add(CourseItem.ProgressBox(overallProgress, resumeText))
 
-        items.add(CourseItem.InfoRow(sections = course.units.size, hours = "10 hours"))
+        items.add(CourseItem.InfoRow(sections = course.units.size, hours = "10 сағат"))
 
 
         course.units.forEachIndexed { index, unit ->

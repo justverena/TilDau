@@ -94,6 +94,8 @@ class ProfileViewActivity : AppCompatActivity() {
             tvName.text = user.name
             tvEmail.text = user.email
             tvPassword.text = "********"
+
+
         }
     }
 }

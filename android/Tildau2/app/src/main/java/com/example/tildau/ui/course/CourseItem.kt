@@ -31,7 +31,9 @@ sealed class CourseItem {
         val parentUnitNumber: Int
     ) : CourseItem()
 
-    object CourseCard : CourseItem()
+    data class CourseCard(
+        val title: String
+    ) : CourseItem()
     data class InfoRow(val sections: Int, val hours: String) : CourseItem()
     data class ProgressBox(val progressPercent: Int, val resumeText: String) : CourseItem()
 

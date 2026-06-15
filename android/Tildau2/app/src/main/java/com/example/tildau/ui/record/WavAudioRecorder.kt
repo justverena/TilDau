@@ -7,13 +7,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.annotation.SuppressLint
 
-
 class WavAudioRecorder(private val context: Context) {
-
     private val sampleRate = 44100
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-
     private var audioRecord: AudioRecord? = null
     private var isRecording = false
     private var recordingThread: Thread? = null
@@ -23,17 +20,16 @@ class WavAudioRecorder(private val context: Context) {
 
     var onAmplitudeChanged: ((Int) -> Unit)? = null
 
-
     @SuppressLint("MissingPermission")
     fun startRecording() {
 
-        val minbufferSize = AudioRecord.getMinBufferSize(
+        val unbufferedSize = AudioRecord.getMinBufferSize(
             sampleRate,
             channelConfig,
             audioFormat
         )
 
-        val bufferSize = minbufferSize * 2
+        val bufferSize = unbufferedSize * 2
 
         audioRecord = AudioRecord(
             MediaRecorder.AudioSource.MIC,
@@ -67,9 +63,6 @@ class WavAudioRecorder(private val context: Context) {
     }
 
     private fun writeAudioData(file: File, bufferSize: Int) {
-
-
-
         val buffer = ByteArray(bufferSize)
         var totalAudioLen = 0
 
@@ -122,7 +115,6 @@ class WavAudioRecorder(private val context: Context) {
         header[3] = 'F'.code.toByte()
 
         writeInt(header, 4, totalDataLen)
-
         header[8] = 'W'.code.toByte()
         header[9] = 'A'.code.toByte()
         header[10] = 'V'.code.toByte()

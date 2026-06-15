@@ -7,23 +7,21 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="12dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="4dp"
-    android:backgroundTint="#9C7BFF">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@drawable/bg_gradient_card1"
         android:padding="14dp">
 
-        <!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- LEFT -->
             <ImageView
                 android:id="@+id/btnPrevWeek"
                 android:layout_width="32dp"
@@ -32,19 +30,17 @@
                 android:src="@drawable/ic_chevron_left"
                 app:tint="@android:color/white"/>
 
-            <!-- MONTH -->
             <TextView
                 android:id="@+id/tvWeekMonth"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="May 2026"
+                android:text="Ай мен жыл"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- RIGHT -->
             <ImageView
                 android:id="@+id/btnNextWeek"
                 android:layout_width="32dp"
@@ -55,24 +51,24 @@
 
         </LinearLayout>
 
-        <!-- WEEK LABELS -->
+
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="7"
             android:layout_marginTop="12dp">
 
-            <TextView style="@style/DayLabel" android:text="MO"/>
-            <TextView style="@style/DayLabel" android:text="TU"/>
-            <TextView style="@style/DayLabel" android:text="WE"/>
-            <TextView style="@style/DayLabel" android:text="TH"/>
-            <TextView style="@style/DayLabel" android:text="FR"/>
-            <TextView style="@style/DayLabel" android:text="SA"/>
-            <TextView style="@style/DayLabel" android:text="SU"/>
+            <TextView style="@style/DayLabel" android:text="ДС"/>
+            <TextView style="@style/DayLabel" android:text="СС"/>
+            <TextView style="@style/DayLabel" android:text="СР"/>
+            <TextView style="@style/DayLabel" android:text="БС"/>
+            <TextView style="@style/DayLabel" android:text="ЖМ"/>
+            <TextView style="@style/DayLabel" android:text="СБ"/>
+            <TextView style="@style/DayLabel" android:text="ЖС"/>
 
         </GridLayout>
 
-        <!-- WEEK -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvWeekCalendar"
             android:layout_width="match_parent"

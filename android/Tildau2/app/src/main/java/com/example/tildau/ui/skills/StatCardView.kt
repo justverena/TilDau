@@ -35,16 +35,17 @@ class StatCardView @JvmOverloads constructor(
         binding.tvValue.text = value.toString()
         binding.progressBar.progress = value
 
-        val color = if (isActive) {
+        // ❌ УБРАТЬ всю логику серого цвета
+        binding.tvValue.setTextColor(
             ContextCompat.getColor(context, R.color.black)
-        } else {
-            ContextCompat.getColor(context, R.color.gray)
-        }
-
-        binding.tvValue.setTextColor(color)
+        )
     }
 
-    fun setCardColor(color: Int) {
-        setCardBackgroundColor(color)
+    fun setCardBackgroundResource(drawableRes: Int) {
+        background =
+            ContextCompat.getDrawable(
+                context,
+                drawableRes
+            )
     }
 }

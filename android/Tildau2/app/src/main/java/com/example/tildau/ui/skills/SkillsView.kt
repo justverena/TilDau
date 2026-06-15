@@ -1,9 +1,11 @@
 package com.example.tildau.ui.skills
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import com.example.tildau.R
 import com.example.tildau.databinding.ViewSkillsBinding
 
 class SkillsView @JvmOverloads constructor(
@@ -24,15 +26,20 @@ class SkillsView @JvmOverloads constructor(
         ).getDrawable(0)
     }
 
+    @SuppressLint("SetTextI18n")
     fun setData(
         fluency: Int,
         pronunciation: Int,
         overall: Int
     ) {
-        binding.tvFluency.text = "Fluency: $fluency"
-        binding.tvPronunciation.text = "Pronunciation: $pronunciation"
-        binding.tvOverall.text = "Overall: $overall"
+        binding.tvFluency.text =
+            context.getString(R.string.fluency) + ": $fluency"
 
+        binding.tvPronunciation.text =
+            context.getString(R.string.pronunciation) + ": $pronunciation"
+
+        binding.tvOverall.text =
+            context.getString(R.string.overall) + ": $overall"
         setFill(binding.tvFluency, fluency)
         setFill(binding.tvPronunciation, pronunciation)
         setFill(binding.tvOverall, overall)

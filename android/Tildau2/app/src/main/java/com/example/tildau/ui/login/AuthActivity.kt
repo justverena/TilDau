@@ -30,21 +30,4 @@ class AuthActivity : AppCompatActivity() {
     }
 
 
-
-//    override fun onStart() {
-//        super.onStart()
-//
-//        val prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE)
-//        val token = prefs.getString("jwt_token", null)
-//
-//        if (!token.isNullOrEmpty()) {
-//            // Если уже залогинен — сразу в MainActivity
-//            val intent = Intent(this, MainActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//            startActivity(intent)
-//            finish()
-//        }
-//    }
-
-
 }

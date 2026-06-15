@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.tildau.R
 import com.example.tildau.data.remote.ApiClient
 import com.example.tildau.data.remote.AuthApi
 import com.example.tildau.data.repository.AuthRepository
@@ -54,14 +55,14 @@ class RegisterPasswordActivity : AppCompatActivity() {
 
         viewModel.result.observe(this) { result ->
             result.onFailure { exception ->
-                Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Қате: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.btnContinue.setOnClickListener {
             val password = binding.etPassword.text.toString()
             if (password.isBlank()) {
-                Toast.makeText(this, "Password cannot be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.password_empty_error), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

@@ -13,9 +13,9 @@ import kotlinx.coroutines.launch
 
 class RecordViewModel(application: Application) : AndroidViewModel(application) {
 
-    // =========================
-    // STATE
-    // =========================
+
+
+
     enum class RecordingState {
         IDLE,
         RECORDING,
@@ -30,9 +30,9 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         _uiState.value = state
     }
 
-    // =========================
-    // EXERCISE DATA
-    // =========================
+
+
+
     private val _exercise = MutableStateFlow<ExerciseFullResponse?>(null)
     val exercise: StateFlow<ExerciseFullResponse?> = _exercise
 
@@ -50,7 +50,7 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                 _exercise.value = result
 
             } catch (e: Exception) {
-                _error.value = "Failed to load exercise"
+                _error.value = "Жаттығуды жүктеу мүмкін болмады"
                 android.util.Log.e("RecordViewModel", "Error loading exercise", e)
             }
         }

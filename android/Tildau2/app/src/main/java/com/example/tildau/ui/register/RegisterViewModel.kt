@@ -38,7 +38,7 @@ class RegisterViewModel(
         val password = password
 
         if (email.isNullOrBlank() || name.isNullOrBlank() || password.isNullOrBlank()) {
-            _result.value = Result.failure(Exception("All fields are required"))
+            _result.value = Result.failure(Exception("Барлық өрістер қажет"))
             return
         }
 

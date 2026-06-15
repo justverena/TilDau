@@ -19,11 +19,10 @@
             android:src="@drawable/ic_close_black"
             android:layout_marginBottom="24dp"
             android:layout_gravity="start"
-            android:visibility="invisible"
-            />
+            android:visibility="invisible" />
 
         <TextView
-            android:text="Login"
+            android:text="Кіру"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#000000"
@@ -31,7 +30,7 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:text="Enter your details"
+            android:text="Мәліметтерді енгізіңіз"
             android:textSize="14sp"
             android:textColor="#6b6b6b"
             android:layout_marginBottom="24dp"
@@ -42,7 +41,7 @@
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Email"
+            android:hint="Электрондық пошта"
             android:inputType="textEmailAddress"
             android:background="@drawable/bg_input"
             android:paddingHorizontal="16dp"
@@ -60,7 +59,7 @@
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:hint="Password"
+                android:hint="Құпия сөз"
                 android:inputType="textPassword"
                 android:background="@drawable/bg_input"
                 android:paddingHorizontal="16dp"
@@ -79,18 +78,19 @@
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_eye_show" />
         </RelativeLayout>
+
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Login"
+            android:text="Кіру"
             android:textColor="#ffffff"
             android:background="@drawable/bg_input"
             android:layout_marginBottom="16dp" />
 
         <TextView
             android:id="@+id/forgotPassword"
-            android:text="Forgot password?"
+            android:text="Құпия сөзді ұмыттыңыз ба?"
             android:textSize="14sp"
             android:textColor="#6b6b6b"
             android:layout_gravity="center_horizontal"
@@ -110,7 +110,6 @@
                 android:layout_height="1dp"
                 android:layout_weight="1"
                 android:background="#d9d9d9" />
-
 
         </LinearLayout>
 

@@ -28,15 +28,15 @@ class RecordFragment : Fragment() {
 
     private var recordedAudioPlayer: MediaPlayer? = null
 
-    // =========================
-    // PERMISSION
-    // =========================
+
+
+
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startRecording()
             else Toast.makeText(
                 requireContext(),
-                "Microphone permission required",
+                "Микрофонға рұқсат қажет",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -45,16 +45,16 @@ class RecordFragment : Fragment() {
         private const val ARG_EXERCISE_ID = "ARG_EXERCISE_ID"
     }
 
-    // =========================
-    // LIFECYCLE
-    // =========================
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         exerciseId = arguments?.getString(ARG_EXERCISE_ID) ?: ""
 
         if (exerciseId.isEmpty()) {
-            Toast.makeText(requireContext(), "Exercise ID missing", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Жаттығу идентификаторы табылмады", Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
@@ -78,9 +78,9 @@ class RecordFragment : Fragment() {
         viewModel.loadExercise(exerciseId)
     }
 
-    // =========================
-    // SETUP
-    // =========================
+
+
+
     private fun setupManagers() {
         recordManager = RecordManager(WavAudioRecorder(requireContext()))
         audioPlayer = binding.audioPlayer
@@ -127,9 +127,9 @@ class RecordFragment : Fragment() {
         }
     }
 
-    // =========================
-    // OBSERVE
-    // =========================
+
+
+
     private fun observeViewModel() {
 
         lifecycleScope.launch {
@@ -153,9 +153,9 @@ class RecordFragment : Fragment() {
         }
     }
 
-    // =========================
-    // UI STATE
-    // =========================
+
+
+
     private fun updateUI(state: RecordViewModel.RecordingState) {
 
         when (state) {
@@ -164,35 +164,35 @@ class RecordFragment : Fragment() {
                 binding.btnRecord.setImageResource(R.drawable.btn_record)
                 binding.btnSecondaryLeft.visibility = View.GONE
                 binding.btnSecondaryRight.visibility = View.GONE
-                binding.recordHint.text = "Tap to start recording"
+                binding.recordHint.text = "Жазуды бастау үшін басыңыз"
             }
 
             RecordViewModel.RecordingState.RECORDING -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_pause)
                 binding.btnSecondaryLeft.visibility = View.GONE
                 binding.btnSecondaryRight.visibility = View.GONE
-                binding.recordHint.text = "Recording..."
+                binding.recordHint.text = "Жазылуда..."
             }
 
             RecordViewModel.RecordingState.FINISHED -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_play2)
                 binding.btnSecondaryLeft.visibility = View.VISIBLE
                 binding.btnSecondaryRight.visibility = View.VISIBLE
-                binding.recordHint.text = "Tap to play recording"
+                binding.recordHint.text = "Жазбаны тыңдау үшін басыңыз"
             }
 
             RecordViewModel.RecordingState.PLAYING -> {
                 binding.btnRecord.setImageResource(R.drawable.btn_pause)
                 binding.btnSecondaryLeft.visibility = View.VISIBLE
                 binding.btnSecondaryRight.visibility = View.VISIBLE
-                binding.recordHint.text = "Playing..."
+                binding.recordHint.text = "Ойнатылуда..."
             }
         }
     }
 
-    // =========================
-    // RECORDING
-    // =========================
+
+
+
     private fun startRecording() {
         recordManager.startRecording()
         viewModel.setState(RecordViewModel.RecordingState.RECORDING)
@@ -204,9 +204,9 @@ class RecordFragment : Fragment() {
         viewModel.setState(RecordViewModel.RecordingState.IDLE)
     }
 
-    // =========================
-    // PLAYBACK
-    // =========================
+
+
+
     private fun playRecordedAudio() {
 
         val path = recordManager.outputPath ?: return
@@ -256,9 +256,9 @@ class RecordFragment : Fragment() {
         recordedAudioPlayer = null
     }
 
-    // =========================
-    // NAVIGATION
-    // =========================
+
+
+
     private fun stopRecordingAndNavigate() {
         val audioPath = recordManager.outputPath ?: return
         val exercise = viewModel.exercise.value
@@ -276,9 +276,9 @@ class RecordFragment : Fragment() {
         )
     }
 
-    // =========================
-    // UI BINDING
-    // =========================
+
+
+
     private fun bindExerciseUI(exercise: com.example.tildau.data.model.exercise.ExerciseFullResponse) {
 
         binding.exerciseTitle.text = exercise.title
@@ -286,11 +286,11 @@ class RecordFragment : Fragment() {
 
         binding.expectedText.text =
             exercise.expectedText?.takeIf { it.isNotEmpty() }
-                ?: "Listen to the audio"
+                ?: "Аудионы тыңдаңыз"
 
-        val audioUrl = exercise.referenceAudioUrl
-            ?.replace("http://minio:9000", "http://10.0.2.2:9000")
-
+        val audioUrl = exercise.referenceAudioUrl?.let {
+            "http://10.0.2.2$it"
+        }
         Log.d("AUDIO_DEBUG", "FINAL PLAY URL = $audioUrl")
 
         if (!audioUrl.isNullOrEmpty()) {
@@ -301,9 +301,9 @@ class RecordFragment : Fragment() {
         }
     }
 
-    // =========================
-    // CLEANUP
-    // =========================
+
+
+
     override fun onDestroyView() {
         super.onDestroyView()
 

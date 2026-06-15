@@ -9,13 +9,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- HEADER -->
+
         <LinearLayout
             android:id="@+id/courseHeader"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:orientation="horizontal"
-            android:background="#cfc6e8"
+            android:background="@drawable/bg_page"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
@@ -24,25 +24,25 @@
                 android:id="@+id/courseTitleHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Statistics"
+                android:text="@string/statistics"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- CONTENT -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- STREAK -->
+
             <TextView
                 android:id="@+id/tvStreak"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Practiced 5 days in a row!"
-                android:textSize="16sp"
+                android:text="@string/practiced_5_days"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#1C1C1E" />
 
@@ -50,29 +50,29 @@
                 android:id="@+id/tvStreakHint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Just 2 more days to hit your weekly goal."
+                android:text="@string/hit_weekly_goal"
                 android:textSize="12sp"
                 android:textColor="#7A7A7A"
                 android:layout_marginBottom="12dp"
                 android:visibility="gone"/>
 
-            <!-- CALENDAR -->
+
             <com.example.tildau.ui.calendar.CalendarView
                 android:id="@+id/calendarView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- SKILL TITLE -->
+
             <TextView
                 android:layout_marginTop="16dp"
-                android:text="Skill Trends"
+                android:text="@string/skill_trends"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textColor="#1C1C1E"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- ✅ FIXED SKILL CARDS (CUSTOM VIEW) -->
+
             <LinearLayout
                 android:id="@+id/skillContainer"
                 android:layout_width="match_parent"
@@ -102,7 +102,7 @@
                     android:layout_weight="1" />
             </LinearLayout>
 
-            <!-- ACHIEVEMENTS -->
+
             <LinearLayout
                 android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
@@ -110,9 +110,9 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:text="Achievements"
+                    android:text="Жетістіктеріңіз"
                     android:textStyle="bold"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
@@ -123,7 +123,7 @@
 
                 <TextView
                     android:id="@+id/tvViewAll"
-                    android:text="View all →"
+                    android:text="@string/view_all"
                     android:textColor="#6C4CF1"
                     android:textSize="12sp"
                     android:layout_width="wrap_content"

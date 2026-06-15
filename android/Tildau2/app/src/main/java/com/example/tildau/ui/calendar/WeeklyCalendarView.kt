@@ -93,9 +93,8 @@ class WeeklyCalendarView @JvmOverloads constructor(
             )
         }
 
-        // 🔥 MONTH TITLE
         tvMonth.text =
-            "${monday.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH)} ${monday.year}"
+            "${monday.month.getDisplayName(TextStyle.FULL, Locale("kk"))} ${monday.year}"
 
         rvWeek.adapter = CalendarAdapter(days)
     }

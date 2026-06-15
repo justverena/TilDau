@@ -45,19 +45,13 @@ class AnalyzeFragment : Fragment() {
         exerciseId = arguments?.getString("exerciseId") ?: ""
 
         if (audioPath.isEmpty() || exerciseId.isEmpty()) {
-            Toast.makeText(requireContext(), "Audio file or exercise missing", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Жаттығу немесе аудиожазба табылмады", Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressedDispatcher.onBackPressed()
             return
         }
 
-        binding.loadingView.setTitle("Analyzing your speech...")
-        binding.loadingView.setSubtitle("This may take a few minutes.")
-
-        binding.toolbar.setNavigationOnClickListener {
-            if (!isLoading) {
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
-        }
+        binding.loadingView.setTitle("Сөзіңіз талданып жатыр...")
+        binding.loadingView.setSubtitle("Бұл біраз уақыт алуы мүмкін.")
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             if (!isLoading) {
@@ -70,7 +64,7 @@ class AnalyzeFragment : Fragment() {
 
         val file = File(audioPath)
         if (!file.exists()) {
-            Toast.makeText(requireContext(), "Audio file not found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Аудиожазба табылмады", Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressedDispatcher.onBackPressed()
             return
         }

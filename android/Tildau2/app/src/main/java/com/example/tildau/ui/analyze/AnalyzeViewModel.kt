@@ -32,7 +32,7 @@ class AnalyzeViewModel : ViewModel() {
             try {
                 val file = File(audioPath)
                 if (!file.exists()) {
-                    _state.value = AnalyzeState.Error("Audio file not found")
+                    _state.value = AnalyzeState.Error("Аудиожазба табылмады")
                     return@launch
                 }
 
@@ -48,7 +48,9 @@ class AnalyzeViewModel : ViewModel() {
                 _state.value = AnalyzeState.Success(response)
 //                _nextStep.value = response.nextStep // вот сюда
             } catch (e: Exception) {
-                _state.value = AnalyzeState.Error(e.message ?: "Unknown error")
+                _state.value = AnalyzeState.Error(
+                    e.message ?: "Белгісіз қате"
+                )
             }
         }
     }

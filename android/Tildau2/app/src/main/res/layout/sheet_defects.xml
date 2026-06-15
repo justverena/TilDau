@@ -9,18 +9,13 @@
         android:id="@+id/btnRhotacism"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Тахилалия" />
+        android:text="@string/articulation" />
 
     <Button
         android:id="@+id/btnLambdacism"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Дислалия" />
+        android:text="@string/stuttering" />
 
-    <Button
-        android:id="@+id/btnSigmatism"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Афазия" />
 
 </LinearLayout>

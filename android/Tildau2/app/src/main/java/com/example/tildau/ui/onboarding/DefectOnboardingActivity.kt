@@ -60,8 +60,6 @@ class DefectOnboardingActivity : AppCompatActivity() {
         view.findViewById<android.widget.Button>(R.id.btnLambdacism)
             .setOnClickListener { selectDefect(2, dialog) }
 
-        view.findViewById<android.widget.Button>(R.id.btnSigmatism)
-            .setOnClickListener { selectDefect(3, dialog) }
 
         dialog.show()
     }
@@ -76,7 +74,7 @@ class DefectOnboardingActivity : AppCompatActivity() {
                 if (!ok) {
                     Toast.makeText(
                         this@DefectOnboardingActivity,
-                        "Дефект не сохранился",
+                        "Дефект дұрыс сақталған жоқ",
                         Toast.LENGTH_SHORT
                     ).show()
                     return@launch

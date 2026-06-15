@@ -79,7 +79,7 @@ class ProfileActivity : AppCompatActivity() {
             }.onFailure {
                 Toast.makeText(
                     this,
-                    it.message ?: "Update failed",
+                    it.message ?: "Жаңарту сәтсіз аяқталды",
                     Toast.LENGTH_SHORT
                 ).show()
             }

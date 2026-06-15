@@ -1,6 +1,7 @@
 package com.example.tildau.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +28,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        Log.d("TAPBAR_DEBUG", "Prefs ALL = ${getSharedPreferences("app_prefs", MODE_PRIVATE).all}")
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -59,10 +62,22 @@ class MainActivity : AppCompatActivity() {
             tapBarController.onProfileClicked()
         }
 
+//        binding.tapbar.btnStart.setOnClickListener {
+//            val courseId = getCurrentCourseId()
+//
+//            tapBarController.onStartClicked(courseId) {
+//                startOrResumeCourse()
+//            }
+//        }
+
         binding.tapbar.btnStart.setOnClickListener {
+            Log.d("TAPBAR_DEBUG", "START CLICKED")
+
             val courseId = getCurrentCourseId()
+            Log.d("TAPBAR_DEBUG", "courseId = $courseId")
 
             tapBarController.onStartClicked(courseId) {
+                Log.d("TAPBAR_DEBUG", "CALLING startOrResumeCourse")
                 startOrResumeCourse()
             }
         }
@@ -78,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         val courseId = getCurrentCourseId()
 
         if (courseId == null) {
-            Toast.makeText(this, "No course selected", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Курс таңдалған жоқ", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -114,6 +129,10 @@ class MainActivity : AppCompatActivity() {
     // -----------------------------
     private fun getCurrentCourseId(): String? {
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        return prefs.getString("current_course_id", null)
+        val id = prefs.getString("current_course_id", null)
+
+        Log.d("TAPBAR_DEBUG", "READ courseId from prefs = $id")
+
+        return id
     }
 }

@@ -38,16 +38,16 @@ class ProfileEditActivity : AppCompatActivity() {
         // UI настройка
         when (fieldName) {
             "name" -> {
-                tvEditTitle.text = "Edit Name"
-                tvFieldLabel.text = "Name"
+                tvEditTitle.text = "Атын өзгерту"
+                tvFieldLabel.text = "Аты"
             }
             "email" -> {
-                tvEditTitle.text = "Edit Email"
+                tvEditTitle.text = "Email өзгерту"
                 tvFieldLabel.text = "Email"
             }
             "password" -> {
-                tvEditTitle.text = "Edit Password"
-                tvFieldLabel.text = "Password"
+                tvEditTitle.text = "Құпиясөзді өзгерту"
+                tvFieldLabel.text = "Құпиясөз"
                 passwordRepeatLayout.visibility = View.VISIBLE
                 etField.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
@@ -65,7 +65,7 @@ class ProfileEditActivity : AppCompatActivity() {
                 })
                 finish()
             }.onFailure {
-                Toast.makeText(this, it.message ?: "Error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, it.message ?: "Қате", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -73,14 +73,14 @@ class ProfileEditActivity : AppCompatActivity() {
             val value = etField.text.toString()
 
             if (value.isBlank()) {
-                Toast.makeText(this, "Field is empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Өріс бос", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (fieldName == "password") {
                 val repeat = etRepeat.text.toString()
                 if (repeat != value) {
-                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Құпиясөздер сәйкес келмейді", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
             }

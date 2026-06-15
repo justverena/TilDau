@@ -24,7 +24,7 @@
 
         <TextView
             android:id="@+id/insight_title"
-            android:text="AI PERSONALIZED INSIGHTS"
+            android:text="@string/ai_personalized_insights"
             android:textSize="13sp"
             android:textStyle="bold"
             android:letterSpacing="0.05"
@@ -35,7 +35,7 @@
 
     <TextView
         android:id="@+id/insight_text"
-        android:text="Your pronunciation of 'th' sounds was spot on!"
+        android:text="@string/waiting_for_insights"
         android:textSize="13sp"
         android:textStyle="bold"
         android:lineSpacingExtra="4dp"
@@ -45,7 +45,7 @@
 
     <TextView
         android:id="@+id/insight_additional"
-        android:text="To reach 100, try to maintain a more consistent pace between sentences to improve your overall rhythm and flow."
+        android:text="@string/waiting_for_insights"
         android:textSize="13sp"
         android:lineSpacingExtra="4dp"
         android:layout_width="match_parent"

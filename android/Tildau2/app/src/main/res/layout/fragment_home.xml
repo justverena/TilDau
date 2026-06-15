@@ -5,47 +5,91 @@
     android:layout_height="match_parent"
     android:background="#F4F2F8">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/accountHeader"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_page"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/userNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Басты бет"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#000000" />
+
+        </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-        <!-- HOME TITLE -->
         <TextView
-            android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Home"
+            android:text="Апталық белсенділік"
             android:textStyle="bold"
-            android:textSize="28sp"
-            android:textColor="#1C1C1E"
-            android:layout_marginBottom="16dp"/>
+            android:textSize="20sp"
+            android:textColor="#1C1C1E"/>
 
-        <!-- 🔥 WEEKLY CALENDAR -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Осы аптадағы оқу белсенділігіңіз"
+            android:textSize="13sp"
+            android:textColor="#7A7A7A"
+            android:layout_marginBottom="1dp"/>
+
+
         <com.example.tildau.ui.calendar.WeeklyCalendarView
             android:id="@+id/weeklyCalendar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:paddingBottom="14dp"
+            />
+
+
+
+        <include
+            layout="@layout/view_home_welcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
 
         <com.example.tildau.ui.home.courses.YourCoursesView
             android:id="@+id/yourCoursesView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="14dp"/>
 
         <com.example.tildau.ui.skills.SkillsView
             android:id="@+id/skillsView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="14dp"/>
 
         <com.example.tildau.ui.achievements.HomeAchievementsView
             android:id="@+id/homeAchievementsView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="14dp"/>
 
+    </LinearLayout>
     </LinearLayout>
 
 </ScrollView>

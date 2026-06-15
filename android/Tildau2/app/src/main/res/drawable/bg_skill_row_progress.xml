@@ -4,7 +4,7 @@
     <!-- BACKGROUND (full track) -->
     <item>
         <shape>
-            <solid android:color="#F4F0FF"/>
+            <solid android:color="@color/purple_gray"/>
             <corners android:radius="14dp"/>
         </shape>
     </item>
@@ -15,6 +15,10 @@
             <shape>
                 <solid android:color="@color/light_purple"/>
                 <corners android:radius="14dp"/>
+                <gradient
+                    android:startColor="@color/light_purple"
+                    android:endColor="#EEE6FF"
+                    android:angle="90"/>
             </shape>
         </clip>
     </item>

@@ -133,6 +133,13 @@ class HomeFragment : Fragment() {
             )
         }
 
+        binding.homeAchievementsView.onAchievementsClicked = {
+
+            findNavController().navigate(
+                R.id.action_homeFragment_to_achievementFragment
+            )
+        }
+
         binding.skillsView.setOnClickListener {
             findNavController().navigate(R.id.statisticsFragment)
         }
