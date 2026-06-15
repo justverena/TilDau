@@ -70,24 +70,18 @@ public class ExerciseService {
         DefectType defect = getUserDefect(userId);
         Exercise exercise = getExerciseOrThrow(exerciseId, defect.getId());
         progressService.validateExerciseAccess(user, exercise);
-
         byte[] audioBytes = extractAudioBytes(multipartFile);
         String objectKey = uploadToStorage(user, exercise, audioBytes);
-
         UserExercise attempt = createAttempt(user, exercise, objectKey);
-
         try {
             AnalyzeResponse aiResponse = aiService.analyze(audioBytes, exercise.getExpectedText());
-
             if (aiResponse == null) {
                 throw new RuntimeException("AI module returned null");
             }
-
             saveAnalysisResult(attempt, aiResponse);
             boolean passed = aiResponse.getOverallScore() >= PASS_THRESHOLD;
             NextStepResponse nextStep;
             List<AchievementResponse> newAchievements = List.of();
-
             if (passed) {
                 completeAttempt(attempt);
                 progressService.handleSuccessfulAttempt(user, exercise);
@@ -97,9 +91,7 @@ public class ExerciseService {
                 failAttempt(attempt);
                 nextStep = retryExercise(exerciseId);
             }
-
             return submitResponse(attempt, aiResponse, nextStep, newAchievements);
-
         } catch (Exception e) {
             if (attempt.getStatus() == ExerciseStatus.PENDING) {
                 failAttempt(attempt);

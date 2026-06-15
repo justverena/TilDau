@@ -11,3 +11,5 @@
 /ai/.venv/
 /ml/.venv/
 .env
+.vscode/
+.idea/
