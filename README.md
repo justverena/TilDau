@@ -2,7 +2,7 @@
 
 ## Overview
 
-TilDau is an AI-powered speech therapy platform designed to support speech development and pronunciation improvement for children. The system combines mobile learning, speech analysis, and artificial intelligence technologies to provide personalized exercises and automated feedback.
+TilDau is an AI-based online platform for speech training and recovery. The system combines mobile learning, speech analysis, and artificial intelligence technologies to provide personalized exercises and automated feedback.
 
 The platform enables users to complete speech therapy exercises, submit voice recordings, and receive detailed assessments based on pronunciation accuracy, fluency, and speech similarity metrics.
 
@@ -240,5 +240,4 @@ Speech Evaluation Results
 ## License
 
 This project was developed for academic and educational purposes.
-
 All rights reserved.
